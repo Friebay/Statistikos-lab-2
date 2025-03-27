@@ -13,6 +13,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Duomenys atsisiųsti iš <https://github.com/valdas-v1/lithuanian-real-estate-listings>. Duomenys buvo surinkti 2024 m. vasarį iš <https://www.aruodas.lt/> puslapio. Duomenų rinkinyje yra informacija apie parduodamus ir nuomojamus butus, garažus, namus, sklypus ir patalpas.
+
 ## Reading files from all folders
 
 ```{r}
@@ -23,12 +25,7 @@ data_dir <- "C:/Users/zabit/Documents/GitHub/Statistikos-lab-2/data"
 folders <- list.dirs(data_dir, full.names = FALSE, recursive = FALSE)
 
 # Print all folder names
-cat("Folders inside the data directory:\n")
 print(folders)
-
-# Count the number of folders
-num_folders <- length(folders)
-cat("\nTotal number of folders:", num_folders, "\n\n")
 
 # Check if all folders have the file "all_cities_20240214.csv"
 all_have_file <- TRUE
@@ -47,13 +44,6 @@ for (folder in folders) {
 
 # Print results
 cat("Folders with 'all_cities_20240214.csv':", folders_with_file, "out of", num_folders, "\n")
-if (all_have_file) {
-  cat("All folders have the file 'all_cities_20240214.csv'\n")
-} else {
-  cat("Not all folders have the file 'all_cities_20240214.csv'\n")
-  cat("Folders missing the file:\n")
-  print(folders_missing_file)
-}
 ```
 
 ```{r}
@@ -73,7 +63,58 @@ for (folder in folders) {
     })
   }
 }
+```
 
+```{r}
+# First print the number of rows in each dataset
+cat("\n=== Initial Row Counts ===\n")
+for (type in names(csv_data_list)) {
+  if (!is.null(csv_data_list[[type]])) {
+    cat(type, ": ", nrow(csv_data_list[[type]]), " rows\n", sep="")
+  }
+}
+
+# Remove rows with extreme prices (price > 50,000,000 or price < 20)
+for (type in names(csv_data_list)) {
+  if (!is.null(csv_data_list[[type]]) && "price" %in% colnames(csv_data_list[[type]])) {
+    # Count rows with extreme prices
+    extreme_high <- sum(csv_data_list[[type]]$price > 50000000, na.rm = TRUE)
+    extreme_low <- sum(csv_data_list[[type]]$price < 20, na.rm = TRUE)
+    extreme_prices <- extreme_high + extreme_low
+    
+    if (extreme_prices > 0) {
+      # Store original row count
+      original_count <- nrow(csv_data_list[[type]])
+      
+      # Remove rows with extreme prices, keep rows where price is within range or NA
+      csv_data_list[[type]] <- csv_data_list[[type]][(csv_data_list[[type]]$price >= 20 & 
+                                                     csv_data_list[[type]]$price <= 50000000) | 
+                                                     is.na(csv_data_list[[type]]$price), ]
+      
+      # Verify how many rows were removed
+      new_count <- nrow(csv_data_list[[type]])
+      removed_count <- original_count - new_count
+      
+      cat(type, ": Removed ", removed_count, " rows with extreme prices (", extreme_high, 
+          " high, ", extreme_low, " low)\n", sep="")
+    } else {
+      cat(type, ": No rows with extreme prices\n", sep="")
+    }
+  } else if (!is.null(csv_data_list[[type]])) {
+    cat(type, ": No price column found\n", sep="")
+  }
+}
+
+# Print the new row counts
+cat("\n=== Updated Row Counts ===\n")
+for (type in names(csv_data_list)) {
+  if (!is.null(csv_data_list[[type]])) {
+    cat(type, ": ", nrow(csv_data_list[[type]]), " rows\n", sep="")
+  }
+}
+```
+
+```{r}
 # Output summary of data
 cat("\nSummary of all loaded datasets:\n")
 for (folder_name in names(csv_data_list)) {
@@ -81,5 +122,162 @@ for (folder_name in names(csv_data_list)) {
   cat("Number of rows:", nrow(csv_data_list[[folder_name]]), "\n")
   cat("Number of columns:", ncol(csv_data_list[[folder_name]]), "\n")
   cat("Column names:", paste(colnames(csv_data_list[[folder_name]]), collapse = ", "), "\n")
+}
+```
+
+```{r}
+# Summary statistics for price columns across different real estate types
+cat("\n=== Summary Statistics for Price Column ===\n")
+
+# Real estate types to analyze
+real_estate_types <- c("apartments", "houses", "land", "premises")
+
+for (type in real_estate_types) {
+  cat("\n------------------------------------------\n")
+  cat(toupper(type), "PRICE SUMMARY\n")
+  cat("------------------------------------------\n")
+  
+  # Check if this real estate type exists in our list
+  if (type %in% names(csv_data_list)) {
+    df <- csv_data_list[[type]]
+    
+    # Check if price column exists
+    if ("price" %in% colnames(df)) {
+      # Extract price data
+      prices <- df$price
+      
+      # Generate summary statistics
+      cat("Number of observations:", length(prices), "\n")
+      cat("Number of missing values:", sum(is.na(prices)), "\n\n")
+      cat("Summary statistics:\n")
+      print(summary(prices))
+      
+      # Additional statistics
+      cat("\nStandard deviation:", sd(prices, na.rm = TRUE), "\n")
+      cat("Variance:", var(prices, na.rm = TRUE), "\n")
+      cat("Coefficient of variation:", sd(prices, na.rm = TRUE)/mean(prices, na.rm = TRUE) * 100, "%\n")
+    } else {
+      cat("No 'price' column found in", type, "dataset.\n")
+    }
+  } else {
+    cat("No data available for", type, "real estate type.\n")
+  }
+}
+```
+
+```{r}
+# Load ggplot2 for better visualization
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# Create box plots for price data across real estate types
+cat("\n=== Box Plots for Price Distributions ===\n")
+
+# Setting up a 2x2 panel for the plots
+par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
+
+# Real estate types to analyze
+real_estate_types <- c("apartments", "houses", "land", "premises")
+
+# Loop through each type and create box plots
+for (type in real_estate_types) {
+  if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
+    # Get price data
+    prices <- csv_data_list[[type]]$price
+    
+    # Basic box plot
+    boxplot(prices, main = paste(toupper(type), "PRICES"), 
+            ylab = "Price (EUR)", col = "lightblue", 
+            outline = TRUE, # Show outliers
+            na.rm = TRUE)
+    
+    # Alternative log-scale box plot (prices often have skewed distributions)
+    # Uncomment below if needed
+    # boxplot(log10(prices[prices > 0]), main = paste(toupper(type), "PRICES (Log Scale)"),
+    #        ylab = "Log10(Price)", col = "lightgreen", outline = TRUE, na.rm = TRUE)
+  } else {
+    # Create an empty plot with a message if data isn't available
+    plot(1, type = "n", xlab = "", ylab = "", 
+         main = paste(toupper(type), "- No data available"))
+    text(1, 1, "No price data available", col = "red")
+  }
+}
+
+# Reset the plot layout
+par(mfrow = c(1, 1))
+
+# Alternative: Create a more sophisticated plot with ggplot2
+# This creates a single plot with all real estate types for comparison
+price_data <- data.frame()
+
+for (type in real_estate_types) {
+  if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
+    # Extract prices and create a data frame
+    temp_data <- data.frame(
+      price = csv_data_list[[type]]$price,
+      type = rep(type, length(csv_data_list[[type]]$price))
+    )
+    price_data <- rbind(price_data, temp_data)
+  }
+}
+
+# Create combined box plot if we have data
+if (nrow(price_data) > 0) {
+  ggplot(price_data, aes(x = type, y = price, fill = type)) +
+    geom_boxplot(outlier.size = 1) +
+    scale_y_continuous(labels = scales::comma) +
+    labs(title = "Price Distribution Across Real Estate Types",
+         x = "Real Estate Type",
+         y = "Price (EUR)") +
+    theme_minimal() +
+    theme(legend.position = "none")
+}
+```
+
+```{r}
+# Load ggplot2 if not already loaded
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# Reset the plot layout
+par(mfrow = c(1, 1))
+
+# Alternative: Create more sophisticated histograms with ggplot2 that use density curves
+# This might be better for highly skewed real estate price data
+for (type in real_estate_types) {
+  if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
+    # Get price data and create a data frame
+    df <- data.frame(price = csv_data_list[[type]]$price)
+    
+    # Create plot object with fixed deprecated features
+    p <- ggplot(df, aes(x = price)) +
+      geom_histogram(aes(y = after_stat(density)),
+                     bins = 30, 
+                     fill = "skyblue", 
+                     color = "white", 
+                     alpha = 0.7) +
+      geom_density(color = "darkblue", linewidth = 1) + # Fixed: size -> linewidth
+      labs(title = paste(toupper(type), "Price Distribution"),
+           x = "Price (EUR)",
+           y = "Density") +
+      theme_minimal()
+    
+    # Print the plot
+    print(p)
+  }
+}
+
+
+# Create faceted histograms in one figure (comparing all types)
+if (nrow(price_data) > 0) {
+  ggplot(price_data, aes(x = price, fill = type)) +
+    geom_histogram(bins = 30, alpha = 0.7) +
+    facet_wrap(~type, scales = "free_y") +
+    labs(title = "Price Distributions by Real Estate Type",
+         x = "Price (EUR)",
+         y = "Count") +
+    theme_minimal() +
+    scale_x_continuous(labels = scales::comma, limits = c(0, 500000)) +
+    coord_cartesian(xlim = c(0, 500000))
 }
 ```
