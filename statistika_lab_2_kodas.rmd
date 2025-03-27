@@ -269,3 +269,12 @@ if (nrow(price_data) > 0) {
     coord_cartesian(xlim = c(0, 500000))
 }
 ```
+3 užduotis: Kiekybiniai duomenys: kaina ("price"), aukštų skaičius, peržiūrų skaičius, namo, buto dydis ("area")
+4. Sudarykite dažnių lenteles kategoriniams kintamiesiems.
+5. Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
+6. Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų
+naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomenų.
+7. Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų trans-
+formacijas.
+8. Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
+9. Pateikite tyrimo atsakymą.
