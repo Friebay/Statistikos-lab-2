@@ -1,0 +1,85 @@
+---
+title: "Statistikos laboratorinis darbas Nr. 2"
+author: "VU"
+date: "2025-03-27"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading files from all folders
+
+```{r}
+# Set the path to the data directory
+data_dir <- "C:/Users/zabit/Documents/GitHub/Statistikos-lab-2/data"
+
+# Get all folder names inside the data directory
+folders <- list.dirs(data_dir, full.names = FALSE, recursive = FALSE)
+
+# Print all folder names
+cat("Folders inside the data directory:\n")
+print(folders)
+
+# Count the number of folders
+num_folders <- length(folders)
+cat("\nTotal number of folders:", num_folders, "\n\n")
+
+# Check if all folders have the file "all_cities_20240214.csv"
+all_have_file <- TRUE
+folders_with_file <- 0
+folders_missing_file <- character(0)
+
+for (folder in folders) {
+  file_path <- file.path(data_dir, folder, "all_cities_20240214.csv")
+  if (file.exists(file_path)) {
+    folders_with_file <- folders_with_file + 1
+  } else {
+    all_have_file <- FALSE
+    folders_missing_file <- c(folders_missing_file, folder)
+  }
+}
+
+# Print results
+cat("Folders with 'all_cities_20240214.csv':", folders_with_file, "out of", num_folders, "\n")
+if (all_have_file) {
+  cat("All folders have the file 'all_cities_20240214.csv'\n")
+} else {
+  cat("Not all folders have the file 'all_cities_20240214.csv'\n")
+  cat("Folders missing the file:\n")
+  print(folders_missing_file)
+}
+```
+
+```{r}
+# Read the CSV files into a list of dataframes
+csv_data_list <- list()
+
+for (folder in folders) {
+  file_path <- file.path(data_dir, folder, "all_cities_20240214.csv")
+  if (file.exists(file_path)) {
+    # Try reading the file
+    tryCatch({
+      df <- read.csv(file_path)
+      csv_data_list[[folder]] <- df
+      cat("Successfully read data from:", folder, "with", nrow(df), "rows and", ncol(df), "columns\n")
+    }, error = function(e) {
+      cat("Error reading file from folder", folder, ":", conditionMessage(e), "\n")
+    })
+  }
+}
+
+# Output summary of data
+cat("\nSummary of all loaded datasets:\n")
+for (folder_name in names(csv_data_list)) {
+  cat("\nDataset from folder:", folder_name, "\n")
+  cat("Number of rows:", nrow(csv_data_list[[folder_name]]), "\n")
+  cat("Number of columns:", ncol(csv_data_list[[folder_name]]), "\n")
+  cat("Column names:", paste(colnames(csv_data_list[[folder_name]]), collapse = ", "), "\n")
+}
+```
