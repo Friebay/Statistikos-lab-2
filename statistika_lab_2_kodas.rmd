@@ -3,6 +3,8 @@ title: "Statistikos laboratorinis darbas Nr. 2"
 author: "VU"
 date: "2025-03-27"
 output:
+  pdf_document:
+    toc: true
   html_document:
     toc: true
     toc_float: true
@@ -13,9 +15,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Duomenys atsisiųsti iš <https://github.com/valdas-v1/lithuanian-real-estate-listings>. Duomenys buvo surinkti 2024 m. vasarį iš <https://www.aruodas.lt/> puslapio. Duomenų rinkinyje yra informacija apie parduodamus ir nuomojamus butus, garažus, namus, sklypus ir patalpas.
+1.  Aprašykite turimus duomenis, nurodykite duomenų šaltinį.
 
-## Reading files from all folders
+Duomenys atsisiųsti iš <https://github.com/valdas-v1/lithuanian-real-estate-listings>. Duomenys buvo surinkti 2024 m. vasarį iš <https://www.aruodas.lt/> puslapio. Duomenų rinkinyje yra informacija apie parduodamus ir nuomojamus butus, garažus, namus, sklypus ir patalpas.
 
 ```{r}
 # Set the path to the data directory
@@ -41,9 +43,6 @@ for (folder in folders) {
     folders_missing_file <- c(folders_missing_file, folder)
   }
 }
-
-# Print results
-cat("Folders with 'all_cities_20240214.csv':", folders_with_file, "out of", num_folders, "\n")
 ```
 
 ```{r}
@@ -106,6 +105,7 @@ for (type in names(csv_data_list)) {
   }
 }
 ```
+
 ```{r}
 for (type in names(csv_data_list)) {
   if (!is.null(csv_data_list[[type]])) {
@@ -269,12 +269,19 @@ if (nrow(price_data) > 0) {
     coord_cartesian(xlim = c(0, 500000))
 }
 ```
-3 užduotis: Kiekybiniai duomenys: kaina ("price"), aukštų skaičius, peržiūrų skaičius, namo, buto dydis ("area")
-4. Sudarykite dažnių lenteles kategoriniams kintamiesiems.
-5. Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
-6. Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų
-naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomenų.
-7. Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų trans-
-formacijas.
-8. Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
-9. Pateikite tyrimo atsakymą.
+
+2.  Išbrėžkite turimų duomenų grafikus (parinkite tinkamiausius). Manau kokių 4 užtektų
+
+3.  Apskaičiuokite pagrindines skaitines charakteristikas kiekybiniams kintamiesiems. Vidurkis (Mean), Mediana (Median), Moda (Mode), Dispersija (Variance), Standartinis nuokrypis (Standard Deviation), Kvartiliai (Quartiles), Tarpkvartilinis plotis (Interquartile Range, IQR), Diapazonas (Range, max-min) Kiekybiniai duomenys: kaina ("price"), aukštų skaičius, peržiūrų skaičius, namo, buto dydis ("area")
+
+4.  Sudarykite dažnių lenteles kategoriniams kintamiesiems.
+
+5.  Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
+
+6.  Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomenų.
+
+7.  Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų trans- formacijas.
+
+8.  Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
+
+9.  Pateikite tyrimo atsakymą.
