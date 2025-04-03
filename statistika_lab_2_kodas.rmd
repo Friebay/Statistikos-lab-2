@@ -64,14 +64,7 @@ for (folder in folders) {
 }
 ```
 
-```{r}
-# First print the number of rows in each dataset
-for (type in names(csv_data_list)) {
-  if (!is.null(csv_data_list[[type]])) {
-    cat(type, ": ", nrow(csv_data_list[[type]]), " rows\n", sep="")
-  }
-}
-```
+Ieškome galimai neteisingai įvestų duomenų.
 
 ```{r}
 # Remove rows with extreme prices (price > 50,000,000 or price < 20)
@@ -107,14 +100,6 @@ for (type in names(csv_data_list)) {
 ```
 
 ```{r}
-for (type in names(csv_data_list)) {
-  if (!is.null(csv_data_list[[type]])) {
-    cat(type, ": ", nrow(csv_data_list[[type]]), " rows\n", sep="")
-  }
-}
-```
-
-```{r}
 # Output summary of data
 cat("\nSummary of all loaded datasets:\n")
 for (folder_name in names(csv_data_list)) {
@@ -122,6 +107,51 @@ for (folder_name in names(csv_data_list)) {
   cat("Number of rows:", nrow(csv_data_list[[folder_name]]), "\n")
   cat("Number of columns:", ncol(csv_data_list[[folder_name]]), "\n")
   cat("Column names:", paste(colnames(csv_data_list[[folder_name]]), collapse = ", "), "\n")
+}
+
+# Get all unique column names across all datasets
+all_columns <- unique(unlist(lapply(csv_data_list, colnames)))
+unique_columns <- sort(all_columns)
+
+# Display unique column names and count
+cat("\n\nTotal unique columns across all datasets:", length(unique_columns), "\n")
+cat("Unique column names:", paste(unique_columns, collapse = ", "), "\n")
+
+# Display sample values for each unique column
+cat("\n\nSample values for each unique column:\n")
+for (col_name in unique_columns) {
+  cat("\n", col_name, ":\n")
+  found_values <- FALSE
+  
+  # Look for this column in each dataset
+  for (dataset_name in names(csv_data_list)) {
+    df <- csv_data_list[[dataset_name]]
+    
+    # Check if this column exists in the current dataset
+    if (col_name %in% colnames(df)) {
+      # Extract non-NA values
+      non_na_values <- df[[col_name]][!is.na(df[[col_name]])]
+      
+      # If we have non-NA values
+      if (length(non_na_values) > 0) {
+        # Take up to 5 samples
+        sample_size <- min(5, length(non_na_values))
+        samples <- non_na_values[1:sample_size]
+        
+        # Display the samples with the dataset name
+        cat("  From ", dataset_name, ": ", 
+            paste(samples, collapse = ", "), 
+            if(length(non_na_values) > 5) " ..." else "", "\n", sep = "")
+        
+        found_values <- TRUE
+        break  # Only show from one dataset to keep output manageable
+      }
+    }
+  }
+  
+  if (!found_values) {
+    cat("  No non-NA values found in any dataset\n")
+  }
 }
 ```
 
@@ -280,7 +310,7 @@ if (nrow(price_data) > 0) {
 
 6.  Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomenų.
 
-7.  Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų trans- formacijas.
+7.  Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
 
 8.  Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
 
