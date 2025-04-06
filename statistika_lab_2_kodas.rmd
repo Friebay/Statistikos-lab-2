@@ -5,6 +5,7 @@ date: "2025-03-27"
 output:
   pdf_document:
     toc: true
+    latex_engine: xelatex
   html_document:
     toc: true
     toc_float: true
@@ -12,7 +13,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
 
 1.  Aprašykite turimus duomenis, nurodykite duomenų šaltinį.
@@ -114,11 +115,11 @@ all_columns <- unique(unlist(lapply(csv_data_list, colnames)))
 unique_columns <- sort(all_columns)
 
 # Display unique column names and count
-cat("\n\nTotal unique columns across all datasets:", length(unique_columns), "\n")
+cat("Total unique columns across all datasets:", length(unique_columns), "\n")
 cat("Unique column names:", paste(unique_columns, collapse = ", "), "\n")
 
 # Display sample values for each unique column
-cat("\n\nSample values for each unique column:\n")
+cat("Sample values for each unique column:\n")
 for (col_name in unique_columns) {
   cat("\n", col_name, ":\n")
   found_values <- FALSE
@@ -134,14 +135,14 @@ for (col_name in unique_columns) {
       
       # If we have non-NA values
       if (length(non_na_values) > 0) {
-        # Take up to 5 samples
-        sample_size <- min(5, length(non_na_values))
+        # Take up to 3 samples
+        sample_size <- min(3, length(non_na_values))
         samples <- non_na_values[1:sample_size]
         
         # Display the samples with the dataset name
         cat("  From ", dataset_name, ": ", 
             paste(samples, collapse = ", "), 
-            if(length(non_na_values) > 5) " ..." else "", "\n", sep = "")
+            if(length(non_na_values) > 3) " ..." else "", "\n", sep = "")
         
         found_values <- TRUE
         break  # Only show from one dataset to keep output manageable
@@ -178,55 +179,20 @@ for (type in real_estate_types) {
       
       # Additional statistics
       cat("\nStandard deviation:", sd(prices, na.rm = TRUE), "\n")
-    } else {
-      cat("No 'price' column found in", type, "dataset.\n")
     }
-  } else {
-    cat("No data available for", type, "real estate type.\n")
   }
 }
 ```
 
 ```{r}
-# Load ggplot2 for better visualization
-if(!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
-
-# Setting up a 2x2 panel for the plots
-par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
 
 # Real estate types to analyze
 real_estate_types <- c("apartments", "houses", "land", "premises")
 
-# Loop through each type and create box plots
-for (type in real_estate_types) {
-  if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
-    # Get price data
-    prices <- csv_data_list[[type]]$price
-    
-    # Basic box plot
-    boxplot(prices, main = paste(toupper(type), "PRICES"), 
-            ylab = "Price (EUR)", col = "lightblue", 
-            outline = TRUE, # Show outliers
-            na.rm = TRUE)
-    
-    # Alternative log-scale box plot (prices often have skewed distributions)
-    # Uncomment below if needed
-    # boxplot(log10(prices[prices > 0]), main = paste(toupper(type), "PRICES (Log Scale)"),
-    #        ylab = "Log10(Price)", col = "lightgreen", outline = TRUE, na.rm = TRUE)
-  } else {
-    # Create an empty plot with a message if data isn't available
-    plot(1, type = "n", xlab = "", ylab = "", 
-         main = paste(toupper(type), "- No data available"))
-    text(1, 1, "No price data available", col = "red")
-  }
-}
-
 # Reset the plot layout
 par(mfrow = c(1, 1))
 
-# Alternative: Create a more sophisticated plot with ggplot2
-# This creates a single plot with all real estate types for comparison
 price_data <- data.frame()
 
 for (type in real_estate_types) {
@@ -251,6 +217,19 @@ if (nrow(price_data) > 0) {
     theme_minimal() +
     theme(legend.position = "none")
 }
+
+# Create combined box plot if we have data
+if (nrow(price_data) > 0) {
+  ggplot(price_data, aes(x = type, y = price, fill = type)) +
+    geom_boxplot(outlier.size = 1) +
+    scale_y_continuous(labels = scales::comma,
+                       limits = c(NA, 1000000)) + # Set the upper limit
+    labs(title = "Price Distribution Across Real Estate Types",
+         x = "Real Estate Type",
+         y = "Price (EUR)") +
+    theme_minimal() +
+    theme(legend.position = "none")
+}
 ```
 
 ```{r}
@@ -258,8 +237,6 @@ if (nrow(price_data) > 0) {
 # Reset the plot layout
 par(mfrow = c(1, 1))
 
-# Alternative: Create more sophisticated histograms with ggplot2 that use density curves
-# This might be better for highly skewed real estate price data
 for (type in real_estate_types) {
   if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
     # Get price data and create a data frame
@@ -284,25 +261,83 @@ for (type in real_estate_types) {
     print(p)
   }
 }
-
-
-# Create faceted histograms in one figure (comparing all types)
-if (nrow(price_data) > 0) {
-  ggplot(price_data, aes(x = price, fill = type)) +
-    geom_histogram(bins = 30, alpha = 0.7) +
-    facet_wrap(~type, scales = "free_y") +
-    labs(title = "Price Distributions by Real Estate Type",
-         x = "Price (EUR)",
-         y = "Count") +
-    theme_minimal() +
-    scale_x_continuous(labels = scales::comma, limits = c(0, 500000)) +
-    coord_cartesian(xlim = c(0, 500000))
-}
 ```
 
 2.  Išbrėžkite turimų duomenų grafikus (parinkite tinkamiausius). Manau kokių 4 užtektų
 
-3.  Apskaičiuokite pagrindines skaitines charakteristikas kiekybiniams kintamiesiems. Vidurkis (Mean), Mediana (Median), Moda (Mode), Dispersija (Variance), Standartinis nuokrypis (Standard Deviation), Kvartiliai (Quartiles), Tarpkvartilinis plotis (Interquartile Range, IQR), Diapazonas (Range, max-min) Kiekybiniai duomenys: kaina ("price"), aukštų skaičius, peržiūrų skaičius, namo, buto dydis ("area")
+3.  Apskaičiuokite pagrindines skaitines charakteristikas kiekybiniams kintamiesiems. Vidurkis (Mean), Mediana (Median), Moda (Mode), Dispersija (Variance), Standartinis nuokrypis (Standard Deviation), Kvartiliai (Quartiles), Tarpkvartilinis plotis (Interquartile Range, IQR), Diapazonas (Range, max-min)
+Kiekybiniai duomenys: kaina ("price"), peržiūrų skaičius ("views_total"), būsto dydis ("area" iš apartments), žemės ploto dydis ("area_.a." iš land), build_year iš apartments, buto aukštas ("floor"), kambarių skaičius ("number_of_rooms"), plot_area, price_per_month.
+
+```{r}
+# Filter the dataframes that contain the "price" column
+dataframes_with_price <- csv_data_list[sapply(csv_data_list, function(df) "price" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "price" column
+print(names(dataframes_with_price))
+```
+
+```{r}
+# Filter the dataframes that contain the "price_per_month" column
+dataframes_with_price_per_month <- csv_data_list[sapply(csv_data_list, function(df) "price_per_month" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "price_per_month" column
+print(names(dataframes_with_price_per_month))
+```
+
+```{r}
+# Filter the dataframes that contain the "views_total" column
+dataframes_with_views_total <- csv_data_list[sapply(csv_data_list, function(df) "views_total" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "views_total" column
+print(names(dataframes_with_views_total))
+```
+
+```{r}
+# Filter the dataframes that contain the "area" column
+dataframes_with_area <- csv_data_list[sapply(csv_data_list, function(df) "area" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "area" column
+print(names(dataframes_with_area))
+```
+
+```{r}
+# Filter the dataframes that contain the "area" column
+dataframes_with_area_a <- csv_data_list[sapply(csv_data_list, function(df) "area_.a." %in% colnames(df))]
+
+# Print the names of the datasets that contain the "area_.a" column
+print(names(dataframes_with_area_a))
+```
+
+```{r}
+# Filter the dataframes that contain the "build_year" column
+dataframes_with_build_year <- csv_data_list[sapply(csv_data_list, function(df) "build_year" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "build_year" column
+print(names(dataframes_with_build_year))
+```
+
+```{r}
+# Filter the dataframes that contain the "floor" column
+dataframes_with_floor <- csv_data_list[sapply(csv_data_list, function(df) "floor" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "floor" column
+print(names(dataframes_with_floor))
+```
+```{r}
+# Filter the dataframes that contain the "number_of_rooms" column
+dataframes_with_number_of_rooms <- csv_data_list[sapply(csv_data_list, function(df) "number_of_rooms" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "number_of_rooms" column
+print(names(dataframes_with_number_of_rooms))
+```
+
+```{r}
+# Filter the dataframes that contain the "plot_area" column
+dataframes_with_plot_area <- csv_data_list[sapply(csv_data_list, function(df) "plot_area" %in% colnames(df))]
+
+# Print the names of the datasets that contain the "plot_area" column
+print(names(dataframes_with_plot_area))
+```
 
 4.  Sudarykite dažnių lenteles kategoriniams kintamiesiems.
 
