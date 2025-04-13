@@ -1,97 +1,167 @@
 ---
-title: "Statistikos laboratorinis darbas Nr. 2"
+title: "Nekilnojamojo turto objektų kainų analizė Lietuvoje"
 author: "VU"
-date: "2025-03-27"
+date: "2025-04-17"
 output:
   pdf_document:
     toc: true
+    toc_depth: 3
+    number_sections: true
     latex_engine: xelatex
+    fig_caption: true
   html_document:
     toc: true
+    toc_depth: 3
     toc_float: true
     theme: united
+    fig_caption: true
+    df_print: paged
+    code_folding: show
+  word_document:
+    toc: true
+    toc_depth: '3'
+subtitle: Statistikos laboratorinis darbas Nr. 2
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_chunk$set(
+  echo = TRUE,            # Rodyti kodą
+  warning = FALSE,        # Nerodyti įspėjimų
+  message = FALSE,        # Nerodyti pranešimų
+  fig.align = "center",   # Centruoti paveikslėlius
+  fig.width = 8,          # Nustatyti paveikslėlių plotį
+  fig.height = 6,         # Nustatyti paveikslėlių aukštį
+  out.width = "80%",      # Išvesties plotis dokumente
+  dpi = 300               # Grafikų rezoliucija
+)
+
+# Pagrindinių paketų įkėlimas
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(kableExtra)
 ```
 
-1.  Aprašykite turimus duomenis, nurodykite duomenų šaltinį.
+# Įvadas
 
-Duomenys atsisiųsti iš <https://github.com/valdas-v1/lithuanian-real-estate-listings>. Duomenys buvo surinkti 2024 m. vasarį iš <https://www.aruodas.lt/> puslapio. Duomenų rinkinyje yra informacija apie parduodamus ir nuomojamus butus, garažus, namus, sklypus ir patalpas.
+Šiame tyrime analizuojami Lietuvos nekilnojamojo turto rinkos duomenys, siekiant nustatyti įvairius dėsningumus ir statistines priklausomybes.
 
-```{r}
-# Set the path to the data directory
+# Duomenų aprašymas
+
+Analizei naudojami duomenys buvo atsisiųsti iš [Lithuanian Real Estate Listings](https://github.com/valdas-v1/lithuanian-real-estate-listings) GitHub repozitorijos. Duomenys buvo surinkti 2024 m. vasarį iš [Aruodas.lt](https://www.aruodas.lt/) puslapio. Duomenų rinkinyje yra informacija apie parduodamus ir nuomojamus butus, garažus, namus, sklypus ir patalpas. Tyrime naudojami duomenys apima kainų, ploto, vietos ir kitų svarbių charakteristikų informaciją.
+
+## Duomenų nuskaitymas
+
+```{r data-reading}
+# Duomenų vieta
 data_dir <- "C:/Users/zabit/Documents/GitHub/Statistikos-lab-2/data"
 
-# Get all folder names inside the data directory
+# Gauname aplankų pavadinimus 
 folders <- list.dirs(data_dir, full.names = FALSE, recursive = FALSE)
 
-# Print all folder names
-print(folders)
+# Atspausdiname visų aplankų pavadinimus
+kable(data.frame(Kategorijos = folders), 
+      caption = "Nekilnojamojo turto duomenų kategorijos") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-```{r}
-# Read the CSV files into a list of dataframes
+```{r load-data}
+# CSV failų nuskaitymas į sąrašą
 csv_data_list <- list()
 
 for (folder in folders) {
   file_path <- file.path(data_dir, folder, "all_cities_20240214.csv")
   if (file.exists(file_path)) {
-    # Try reading the file
+    # Bandyti nuskaityti failą
     tryCatch({
       df <- read.csv(file_path)
       csv_data_list[[folder]] <- df
-      cat("Read:", folder, "with", nrow(df), "rows and", ncol(df), "columns\n")
+      cat("Nuskaityta:", folder, nrow(df), "eilutėmis ir", ncol(df), "stulpeliais\n")
     }, error = function(e) {
-      cat("Error", folder, ":", conditionMessage(e), "\n")
+      cat("Klaida nuskaitant", folder, ":", conditionMessage(e), "\n")
     })
   }
 }
 ```
 
-Ieškome galimai neteisingai įvestų duomenų.
+## Duomenų patikrinimas ir išskirčių šalinimas
 
-```{r}
-# Remove rows with extreme prices (price > 25,000,000 or price < 20)
+Prieš pradedant statistinę analizę, būtina identifikuoti ir pašalinti galimai klaidingas ar nekorektiškas reikšmes duomenyse. Nekilnojamojo turto rinkoje egzistuoja neįprastai didelių ar mažų kainų, kurios gali atsirasti dėl duomenų įvedimo klaidų, klaidingo formato ar kitų priežasčių. Tokios išskirtys gali reikšmingai paveikti statistinės analizės rezultatus.
+
+```{r outlier-removal}
+# Apibrėžiame kainų ribas išskirčių identifikavimui
+min_threshold <- 20          # Minimali patikima kaina eurais
+max_threshold <- 25000000    # Maksimali patikima kaina eurais
+
+# Sukuriame rezultatų lentelę
+removal_results <- data.frame(
+  Kategorija = character(),
+  Pašalinta_eilučių = integer(),
+  Per_didelės_kainos = integer(),
+  Per_mažos_kainos = integer(),
+  stringsAsFactors = FALSE
+)
+
+# Tikriname ir šaliname išskirtis kiekviename duomenų rinkinyje
 for (type in names(csv_data_list)) {
   if (!is.null(csv_data_list[[type]]) && "price" %in% colnames(csv_data_list[[type]])) {
-    # Count rows with extreme prices
-    extreme_high <- sum(csv_data_list[[type]]$price > 50000000, na.rm = TRUE)
-    extreme_low <- sum(csv_data_list[[type]]$price < 20, na.rm = TRUE)
-    extreme_prices <- extreme_high + extreme_low
+    # Identifikuojame kraštutines reikšmes
+    extreme_high <- sum(csv_data_list[[type]]$price > max_threshold, na.rm = TRUE)
+    extreme_low <- sum(csv_data_list[[type]]$price < min_threshold, na.rm = TRUE)
+    extreme_total <- extreme_high + extreme_low
     
-    if (extreme_prices > 0) {
-      # Store original row count
+    if (extreme_total > 0) {
+      # Išsaugome pradinį eilučių skaičių
       original_count <- nrow(csv_data_list[[type]])
       
-      # Remove rows with extreme prices, keep rows where price is within range or NA
-      csv_data_list[[type]] <- csv_data_list[[type]][(csv_data_list[[type]]$price >= 20 & 
-                                                     csv_data_list[[type]]$price <= 25000000) | 
-                                                     is.na(csv_data_list[[type]]$price), ]
+      # Filtruojame duomenis, išlaikydami tik patikimas kainas arba NA reikšmes
+      csv_data_list[[type]] <- csv_data_list[[type]][
+        (csv_data_list[[type]]$price >= min_threshold & 
+         csv_data_list[[type]]$price <= max_threshold) | 
+          is.na(csv_data_list[[type]]$price), ]
       
-      # Verify how many rows were removed
+      # Fiksuojame rezultatus
       new_count <- nrow(csv_data_list[[type]])
       removed_count <- original_count - new_count
       
-      cat(type, ": Removed ", removed_count, " rows with extreme prices (", extreme_high, 
-          " high, ", extreme_low, " low)\n", sep="")
-    } else {
-      cat(type, ": No rows with extreme prices\n", sep="")
+      # Pridedame rezultatus į suvestinę
+      removal_results <- rbind(removal_results, data.frame(
+        Kategorija = type,
+        Pašalinta_eilučių = removed_count,
+        Per_didelės_kainos = extreme_high,
+        Per_mažos_kainos = extreme_low
+      ))
     }
-  } else if (!is.null(csv_data_list[[type]])) {
-    cat(type, ": No price column found\n", sep="")
   }
 }
+
+# Atvaizduojame išskirčių šalinimo rezultatus
+if (nrow(removal_results) > 0) {
+  kable(removal_results, 
+        caption = "Išskirčių šalinimo rezultatų suvestinė") %>%
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+} else {
+  cat("Duomenyse nerasta kainų, kurios viršytų nustatytas ribas.")
+}
+
+# Patikriname duomenų rinkinių dydžius po valymo
+data_sizes <- data.frame(
+  Eilučių_skaičius = sapply(csv_data_list, nrow),
+  Stulpelių_skaičius = sapply(csv_data_list, ncol)
+)
+
+kable(data_sizes, 
+      caption = "Duomenų rinkinių dydžiai po išskirčių šalinimo") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+Pašalintos ekstremalios kainos, kurios galėjo iškreipti vidutines reikšmes ir kitas statistines charakteristikas.
 
 ```{r}
 # Output summary of data
-cat("\nSummary of all loaded datasets:\n")
+cat("\nColumn names of all loaded datasets:\n")
 for (folder_name in names(csv_data_list)) {
   cat("\nDataset from folder:", folder_name, "\n")
-  cat("Number of rows:", nrow(csv_data_list[[folder_name]]), "\n")
-  cat("Number of columns:", ncol(csv_data_list[[folder_name]]), "\n")
   cat("Column names:", paste(colnames(csv_data_list[[folder_name]]), collapse = ", "), "\n")
 }
 
@@ -102,7 +172,9 @@ unique_columns <- sort(all_columns)
 # Display unique column names and count
 cat("Total unique columns across all datasets:", length(unique_columns), "\n")
 cat("Unique column names:", paste(unique_columns, collapse = ", "), "\n")
+```
 
+```{r}
 # Display sample values for each unique column
 cat("Sample values for each unique column:\n")
 for (col_name in unique_columns) {
@@ -120,8 +192,8 @@ for (col_name in unique_columns) {
       
       # If we have non-NA values
       if (length(non_na_values) > 0) {
-        # Take up to 3 samples
-        sample_size <- min(3, length(non_na_values))
+        # Take up to 2 samples
+        sample_size <- min(2, length(non_na_values))
         samples <- non_na_values[1:sample_size]
         
         # Display the samples with the dataset name
@@ -141,60 +213,15 @@ for (col_name in unique_columns) {
 }
 ```
 
+2.  Išbrėžkite turimų duomenų grafikus (parinkite tinkamiausius). Manau kokių 4 užtektų
+
 ```{r}
+# Reset the plot layout
+par(mfrow = c(1, 1))
+
 library(ggplot2)
 
-# Real estate types to analyze
-real_estate_types <- c("apartments", "houses", "land", "premises")
-
-# Reset the plot layout
-par(mfrow = c(1, 1))
-
-price_data <- data.frame()
-
-for (type in real_estate_types) {
-  if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
-    # Extract prices and create a data frame
-    temp_data <- data.frame(
-      price = csv_data_list[[type]]$price,
-      type = rep(type, length(csv_data_list[[type]]$price))
-    )
-    price_data <- rbind(price_data, temp_data)
-  }
-}
-
-# Create combined box plot if we have data
-if (nrow(price_data) > 0) {
-  ggplot(price_data, aes(x = type, y = price, fill = type)) +
-    geom_boxplot(outlier.size = 1) +
-    scale_y_continuous(labels = scales::comma) +
-    labs(title = "Price Distribution Across Real Estate Types",
-         x = "Real Estate Type",
-         y = "Price (EUR)") +
-    theme_minimal() +
-    theme(legend.position = "none")
-}
-
-# Create combined box plot if we have data
-if (nrow(price_data) > 0) {
-  ggplot(price_data, aes(x = type, y = price, fill = type)) +
-    geom_boxplot(outlier.size = 1) +
-    scale_y_continuous(labels = scales::comma,
-                       limits = c(NA, 1000000)) + # Set the upper limit
-    labs(title = "Price Distribution Across Real Estate Types",
-         x = "Real Estate Type",
-         y = "Price (EUR)") +
-    theme_minimal() +
-    theme(legend.position = "none")
-}
-```
-
-```{r}
-
-# Reset the plot layout
-par(mfrow = c(1, 1))
-
-for (type in real_estate_types) {
+for (type in c("apartments")) {
   if (type %in% names(csv_data_list) && "price" %in% colnames(csv_data_list[[type]])) {
     # Get price data and create a data frame
     df <- data.frame(price = csv_data_list[[type]]$price)
@@ -218,9 +245,76 @@ for (type in real_estate_types) {
     print(p)
   }
 }
-```
 
-2.  Išbrėžkite turimų duomenų grafikus (parinkite tinkamiausius). Manau kokių 4 užtektų
+# Boxplot: Area distribution for premises and premises_rent only
+premises_types <- c("premises", "premises_rent")
+
+# Create a list to store both plots
+boxplot_list <- list()
+
+for (type in premises_types) {
+  if (type %in% names(csv_data_list) && "area" %in% colnames(csv_data_list[[type]])) {
+    df <- csv_data_list[[type]]
+    df$type <- type  # Add type as a column
+    
+    # Ensure area is numeric
+    df$area <- as.numeric(gsub(",", ".", as.character(df$area)))
+    
+    # Create boxplot
+    p <- ggplot(df, aes(x = type, y = area)) +
+      geom_boxplot(fill = "lightgreen", outlier.color = "red", outlier.size = 2) +
+      labs(title = paste("Area Distribution for", toupper(type)),
+           x = "Real Estate Type",
+           y = "Area (sq. m)") +
+      theme_minimal() +
+      scale_y_continuous(labels = scales::comma, limits = c(0, 1000)) +
+      coord_cartesian(ylim = c(0, 1000))
+    
+    # Print the plot
+    print(p)
+  } else {
+    cat("Dataset", type, "is not available or doesn't have 'area' column\n")
+  }
+}
+
+# Scatter Plot: Price vs. Area
+for (type in c("house_rent")) {
+  if (!is.null(csv_data_list[[type]]) && all(c("price", "area") %in% colnames(csv_data_list[[type]]))) {
+    df <- csv_data_list[[type]]
+    
+    # Standardize the area column: replace commas with dots and convert to numeric
+    df$area <- as.numeric(gsub(",", ".", as.character(df$area)))
+    
+    # Create scatter plot
+    p <- ggplot(df, aes(x = area, y = price)) +
+      geom_point(color = "blue", alpha = 0.5) +
+      labs(title = paste("Price vs. Area for", toupper(type)),
+           x = "Area (sq. m)",
+           y = "Price (EUR)") +
+      theme_minimal() +
+      scale_y_continuous(labels = scales::comma, limits = c(0, 6000)) +
+      scale_x_continuous(labels = scales::comma, limits = c(0, 500))
+    
+    print(p)
+  }
+}
+
+# Bar Chart: Frequency of Building Types for "apartments"
+if ("houses" %in% names(csv_data_list) && "building_type" %in% colnames(csv_data_list[["houses"]])) {
+  df <- csv_data_list[["houses"]]
+  
+  # Create bar chart
+  p <- ggplot(df, aes(x = building_type)) +
+    geom_bar(fill = "skyblue", color = "black") +
+    labs(title = "Frequency of Building Types for APARTMENTS",
+         x = "Building Type",
+         y = "Count") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  print(p)
+}
+```
 
 3.  Apskaičiuokite pagrindines skaitines charakteristikas kiekybiniams kintamiesiems. Mes apskaičiavome šias skaitines charakteristikas:
 
@@ -236,21 +330,9 @@ for (type in real_estate_types) {
 
     Kvartiliai (Quartiles) - 0.25, 0.5, 0.75
 
-    Tarpkvartilinis plotis (IQR)
-
     Minimumuas
     
     Maksimumas
-    
-    Diapazonas (Range = max - min)
-
-    Skewness (Asimetrija) – parodo pasiskirstymo simetriškumą
-
-    Kurtosis – parodo, ar duomenys labiau smailūs ar plokšti nei normalus pasiskirstymas
-
-    Medianos absoliutus nuokrypis (MAD) – atsparus vidurkio vietoje naudoti
-
-    Coeficient of Variation (CV) – santykinis dispersijos matas: SD / mean
 
 Kiekybiniai duomenys: kaina ("price"), peržiūrų skaičius ("views_total"), būsto dydis ("area" iš apartments), žemės ploto dydis ("area_.a." iš land), build_year iš apartments, buto aukštas ("floor"), kambarių skaičius ("number_of_rooms"), plot_area, price_per_month.
 
@@ -258,8 +340,8 @@ Kiekybiniai duomenys: kaina ("price"), peržiūrų skaičius ("views_total"), b�
 # Create a helper function to filter datasets by column name
 filter_datasets_by_column <- function(data_list, column_name) {
   filtered <- data_list[sapply(data_list, function(df) column_name %in% colnames(df))]
-  cat("Datasets with column", column_name, ":\n")
-  print(names(filtered))
+  # cat("Datasets with column", column_name, ":\n")
+  # print(names(filtered))
   return(filtered)
 }
 
@@ -279,134 +361,46 @@ for (col in columns_to_check) {
 ```
 
 ```{r}
-# Helper function to calculate the mode
-get_mode <- function(v) {
-  v <- v[!is.na(v)]
-  uniqv <- unique(v)
-  uniqv[which.max(tabulate(match(v, uniqv)))]
-}
-
-# Load required packages
-library(e1071)  # For skewness and kurtosis
-library(knitr)  # For table formatting
-
-# Function to calculate statistics for a specified variable across multiple datasets
-calculate_statistics <- function(data_list, variable_name, target_datasets) {
-  # Create an empty data frame to store our statistics
-  stats_table <- data.frame(
-    Dataset = character(),
-    Mean = numeric(),
-    Median = numeric(),
-    Mode = numeric(),
-    SD = numeric(),
-    Q1 = numeric(),
-    Q2 = numeric(),
-    Q3 = numeric(),
-    IQR = numeric(),
-    Min = numeric(),
-    Max = numeric(),
-    MAD = numeric(),
-    CV = numeric(),
-    stringsAsFactors = FALSE
-  )
-  
-  # Calculate statistics for each dataframe
+# Simplified function to calculate summary statistics for a specified variable across multiple datasets
+calculate_summary <- function(data_list, variable_name, target_datasets) {
   for (df_name in target_datasets) {
     if (df_name %in% names(data_list) && variable_name %in% colnames(data_list[[df_name]])) {
-      # Show first 10 values (keep this outside the table)
-      cat("Sample from the '", variable_name, "' column for ", df_name, ":\n", sep="")
-      print(head(data_list[[df_name]][[variable_name]], 10))
+      cat("Summary for variable '", variable_name, "' in dataset '", df_name, "':\n", sep="")
+      print(summary(data_list[[df_name]][[variable_name]]))
       cat("\n")
-      
-      # Calculate all statistics
-      var_data <- data_list[[df_name]][[variable_name]]
-      mean_val <- mean(var_data, na.rm = TRUE)
-      median_val <- median(var_data, na.rm = TRUE)
-      mode_val <- get_mode(var_data)
-      sd_val <- sd(var_data, na.rm = TRUE)
-      quartiles <- quantile(var_data, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
-      iqr_val <- IQR(var_data, na.rm = TRUE)
-      min_val <- min(var_data, na.rm = TRUE)
-      max_val <- max(var_data, na.rm = TRUE)
-      mad_val <- mad(var_data, na.rm = TRUE)
-      cv_val <- (sd_val / mean_val) * 100
-      
-      # Add row to stats table
-      stats_table <- rbind(stats_table, data.frame(
-        Dataset = df_name,
-        Mean = mean_val,
-        Median = median_val,
-        Mode = mode_val,
-        SD = sd_val,
-        Q1 = quartiles[1],
-        Q2 = quartiles[2],
-        Q3 = quartiles[3],
-        IQR = iqr_val,
-        Min = min_val,
-        Max = max_val,
-        MAD = mad_val,
-        CV = cv_val
-      ))
     } else {
-      cat("Dataframe", df_name, "does not exist or does not have a '", variable_name, "' column.\n", sep="")
+      cat("Dataset '", df_name, "' does not exist or does not have a '", variable_name, "' column.\n", sep="")
     }
   }
-  
-  return(stats_table)
 }
 
 # Define dataset groups
 sale_datasets <- c("apartments", "garages_parking", "houses", "land", "premises")
 rent_datasets <- c("apartments_rent", "house_rent", "premises_rent")
-floors_datasets <- c("apartments", "apartments_rent", "house_rent", "houses", "premises", "premises_rent")
-rooms_datasets <- c("apartments", "apartments_rent", "house_rent", "houses")
 all_datasets <- c("apartments", "apartments_rent", "garages_parking", "garages_parking_rent", 
                 "house_rent", "houses", "land", "land_rent", "premises", "premises_rent")
 
-# Calculate statistics for price in sale datasets
-price_sale_stats <- calculate_statistics(csv_data_list, "price", sale_datasets)
-kable(price_sale_stats, 
-      caption = "Summary Statistics for Price Across Different Real Estate Types (Sale)",
-      digits = 2,  # Round to 2 decimal places
-      format.args = list(big.mark = ","))  # Add thousands separator
+# Calculate summary for price in sale datasets
+calculate_summary(csv_data_list, "price", sale_datasets)
 
-# Calculate statistics for price in rent datasets
-price_rent_stats <- calculate_statistics(csv_data_list, "price", rent_datasets)
-kable(price_rent_stats, 
-      caption = "Summary Statistics for Price Across Different Real Estate Types (Rent)",
-      digits = 2,  # Round to 2 decimal places
-      format.args = list(big.mark = ","))  # Add thousands separator
+# Calculate summary for price in rent datasets
+calculate_summary(csv_data_list, "price", rent_datasets)
 
-# Calculate statistics for views_total across all datasets
-views_stats <- calculate_statistics(csv_data_list, "views_total", all_datasets)
-kable(views_stats, 
-      caption = "Summary Statistics for Total Views Across Different Real Estate Types",
-      digits = 2,  # Round to 2 decimal places
-      format.args = list(big.mark = ","))  # Add thousands separator
+# Calculate summary for views_total across all datasets
+calculate_summary(csv_data_list, "views_total", all_datasets)
 
+# Calculate summary for no._of_floors
+calculate_summary(csv_data_list, "no._of_floors", all_datasets)
 
-# Calculate statistics for no._of_floors
-floors_stats <- calculate_statistics(csv_data_list, "no._of_floors", floors_datasets)
-kable(floors_stats, 
-      caption = "Summary Statistics for Number of Floors Across Different Real Estate Types",
-      digits = 2,
-      format.args = list(big.mark = ","))
-
-
-
-# Calculate statistics for number_of_rooms
-rooms_stats <- calculate_statistics(csv_data_list, "number_of_rooms", rooms_datasets)
-kable(rooms_stats, 
-      caption = "Summary Statistics for Number of Rooms Across Different Real Estate Types",
-      digits = 2,
-      format.args = list(big.mark = ","))
+# Calculate summary for number_of_rooms
+calculate_summary(csv_data_list, "number_of_rooms", all_datasets)
 ```
 
 4.  Sudarykite dažnių lenteles kategoriniams kintamiesiems.
 
 5.  Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
 
-6.  Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomenų.
+6.  Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomen.
 
 7.  Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
 
