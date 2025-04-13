@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  13 APR 2025 13:41
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  13 APR 2025 18:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -491,6 +491,18 @@ File: bkm-dvipdfm.def 2023-12-10 v1.31 bookmark driver for dvipdfm (HO)
 
 LaTeX Warning: Label `tab:outlier-removal' multiply defined.
 
+
+LaTeX Warning: Label `tab:column-analysis' multiply defined.
+
+
+LaTeX Warning: Label `tab:price_statistics' multiply defined.
+
+
+LaTeX Warning: Label `tab:other_statistics' multiply defined.
+
+
+LaTeX Warning: Label `tab:other_statistics' multiply defined.
+
 )
 \openout1 = `statistika_lab_2_kodas.aux'.
 
@@ -832,204 +844,95 @@ LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 ]
 
 [2]
-Underfull \vbox (badness 10000) detected at line 293
- []
-
-
-Underfull \vbox (badness 10000) detected at line 293
- []
-
-
 
 [3]
 
 [4]
-Overfull \hbox (2197.24498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, number_of_rooms, area, floor, no._of_floors, build_year, equipment, building_type, heating_system, link, add_date, modified, selected, views_total, views_today, house_no., flat_no., building_energy_efficiency_class, description_tags, additional_premises, security, additional_equipment, valid_till, unique_item_number, object[] 
+Overfull \hbox (7.44pt too wide) in paragraph at lines 380--380
+[]|\TU/lmr/m/n/8 Duomenų_rinkinys|  
  []
 
 
-Overfull \hbox (2244.49498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, price_per_month, house_no., number_of_rooms, area, floor, no._of_floors, build_year, equipment, building_type, heating_system, description_tags, additional_premises, additional_equipment, security, link, add_date, modified, selected, views_total, views_today, valid_till, flat_no., building_energy_efficiency_class, unique_item_number[] 
+Overfull \hbox (4.304pt too wide) in paragraph at lines 380--380
+ []|\TU/lmr/m/n/8 Stulpelių_skaičius|
  []
 
 
-Overfull \hbox (1362.49498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, area, type, accommodates_no._of_cars, features, link, add_date, modified, valid_till, selected, views_total, views_today, number, unique_item_number, description_tags[] 
+Overfull \hbox (19.136pt too wide) in paragraph at lines 385--385
+[]|\TU/lmr/m/n/8 garages_parking_rent|  
  []
 
-
-Overfull \hbox (1267.99498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, number, area, type, accommodates_no._of_cars, features, link, add_date, modified, valid_till, selected, views_total, views_today, unique_item_number[] 
- []
-
-
-Overfull \hbox (2559.49498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, price_per_month, plot_area, area, no._of_floors, build_year, equipment, building_type, heating_system, link, add_date, modified, valid_till, selected, views_total, views_today, number_of_rooms, water_system, closest_body_of_water, distance_from_body_of_water, building_energy_efficiency_class, description_tags, additional_premises, additional_equipment, security, house_no., unique_item_number[] 
- []
-
-
-Overfull \hbox (2470.24498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, plot_area, area, no._of_floors, build_year, equipment, building_type, heating_system, link, add_date, modified, selected, views_total, views_today, house_no., number_of_rooms, water_system, closest_body_of_water, distance_from_body_of_water, description_tags, additional_premises, additional_equipment, security, valid_till, building_energy_efficiency_class, unique_item_number[] 
- []
-
-
-Overfull \hbox (1246.99498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, area_.a., purpose, type, link, add_date, modified, views_total, views_today, description_tags, valid_till, selected, unique_item_number, lot_no.[] 
- []
-
-
-Overfull \hbox (1246.99498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, lot_no., area_.a., purpose, type, link, add_date, modified, valid_till, selected, views_total, views_today, description_tags, unique_item_number[] 
- []
-
-
-Overfull \hbox (2092.24498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, house_no., area, floor, no._of_floors, build_year, equipment, premises_sum, purpose, heating_system, water_system, description_tags, additional_equipment, link, add_date, modified, selected, views_total, views_today, unique_item_number, premises_nr., valid_till, security, building_energy_efficiency_class[] 
- []
-
-
-Overfull \hbox (2107.99498pt too wide) in paragraph at lines 416--416
-[]\TU/lmtt/m/n/10 ## Column names: listing_id, type_id, price, region, microdistrict, street, coordinates, images, description, phone_number, private_seller, call_forwarding, reserved, sold_or_rented, price_per_month, house_no., area, floor, no._of_floors, equipment, purpose, building_energy_efficiency_class, link, add_date, modified, valid_till, selected, views_total, views_today, heating_system, additional_equipment, security, water_system, description_tags, premises_nr., build_year, unique_item_number[] 
- []
-
-
-
-[5]
-Overfull \hbox (3283.99498pt too wide) in paragraph at lines 441--441
-[]\TU/lmtt/m/n/10 ## Unique column names: accommodates_no._of_cars, add_date, additional_equipment, additional_premises, area, area_.a., build_year, building_energy_efficiency_class, building_type, call_forwarding, closest_body_of_water, coordinates, description, description_tags, distance_from_body_of_water, equipment, features, flat_no., floor, heating_system, house_no., images, link, listing_id, lot_no., microdistrict, modified, no._of_floors, number, number_of_rooms, object, phone_number, plot_area, premises_nr., premises_sum, price, price_per_month, private_seller, purpose, region, reserved, security, selected, sold_or_rented, street, type, type_id, unique_item_number, valid_till, views_today, views_total, water_system[] 
- []
-
-
-
-[6]
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-
-Overfull \hbox (322.99498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## remontas( nauja santechnika, naujai pravesta elektra . Savininkas ypatingai prižiūrėjo savo turtą, tad sienos ir visa kita, kaip nauja, neapdaužyta.[] 
- []
-
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-
-
-[7]
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-Missing character: There is no ✅ (U+2705) in font [lmmono10-regular]:!
-
-Overfull \hbox (181.24498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## Parduodama iš pirmų rankų. Tarpininkavimo paslaugų nesiūlyti., PARDUODAMAS ERDVUS 82 KV. M. 4 KAMBARIŲ BUTAS ŠIAURĖS PR.![] 
- []
-
-
-Overfull \hbox (1719.49498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## ĮRENGIMAS. Parduodamas butas 82 kv.m. 4 nepereinamų kambarių. Virtuvė didelė ir erdvi. Virtuvėje sumontuotas virtuvinis komplektas, sienos ir grindys išklotos plytelėmis. Kambariuose sudėtas grindų laminatas, sienos dažytos ir tapetuotos. Bute yra du balkonai, abu balkonai įstiklinti stumdomomis sistemomis. Bute sudėti plastikiniai langai, šarvo durys. Tualetas su vonia atskirose patalpose, įrengta dušo kabina.[] 
- []
-
-
-Overfull \hbox (454.24498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## NAMAS. Parduodamas butas yra devynių aukštų daugiabučio 6 aukšte. Namo laiptinė tvarkinga ir prižiūrima. Laiptinė rakinama kodine spyna. Šalia namo erdvi stovėjimo aikštelė.[] 
- []
-
-
-Overfull \hbox (1420.24498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## VIETA. Parduodamas butas yra Šiaurės pr. šalia vadinamo Šiaurės žiedo. Iš šios vietos labai patogu pasiekti bet kurį Kauno mikrorajoną viešuoju transportu, nes šalia yra troleibusų parkas. Iki autostrados taip pat labai patogus išvažiavimas. Šalia namo stadionas ir sporto aikštynas. Visai šalia mokykla, darželis, netoliese prekybos centras, sporto klubas.[] 
- []
-
-
-Overfull \hbox (44.74498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## -----------------------------------------------------------------------------------------------[] 
- []
-
-
-Overfull \hbox (527.74498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ## Padėsime jums profesionaliai ir greitai gauti paskolą kredito įstaigose. Mūsų partneriai: nepriklausomi turto vertintojai, kredito įstaigos, paskolų brokeriai - pasiruošę jums padėti. ...[] 
- []
-
-
-Overfull \hbox (10318.99498pt too wide) in paragraph at lines 682--682
-[]\TU/lmtt/m/n/10 ##   From apartments: , https://aruodas-img.dgn.lt/object_61_115008957/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008959/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008961/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008963/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008965/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008967/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008969/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008971/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008973/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008975/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008977/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008979/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008981/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008983/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008985/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008987/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008993/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008995/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008997/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115008999/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009003/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009005/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009007/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009011/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009013/kaunas-eiguliai-siaures-pr.jpg,https://aruodas-img.dgn.lt/object_61_115009015/kaunas-eiguliai-siaures-pr.jpg ...[] 
- []
-
-
+[5] [6] [7]
 
 [8]
 
 [9]
+File: statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf Graphic file (type pdf)
+<use statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf>
+
 
 [10]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-1.pdf>
+Underfull \vbox (badness 10000) detected at line 647
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 647
+ []
+
 
 
 [11]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-2.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-2.pdf>
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-3.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-3.pdf>
+File: statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf Graphic file (type pdf)
+<use statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf>
 
 
 [12]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-4.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-4.pdf>
+File: statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf Graphic file (type pdf)
+<use statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf>
 
 
 [13]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-5.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-5.pdf>
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-6.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-6.pdf>
-
 
 [14]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-7.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-7.pdf>
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-8.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-8.pdf>
+Underfull \vbox (badness 10000) detected at line 860
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 860
+ []
+
 
 
 [15]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-9.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-9.pdf>
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-10.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-10.pdf>
+Overfull \hbox (53.99498pt too wide) in alignment at lines 888--899
+ [] [] [] [] [] [] [] [] [] 
+ []
 
+
+Overfull \hbox (36.78497pt too wide) in alignment at lines 914--923
+ [] [] [] [] [] [] [] [] [] 
+ []
 
 [16]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-11.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-11.pdf>
+Overfull \hbox (37.34499pt too wide) in alignment at lines 943--960
+ [] [] [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (14.10498pt too wide) in alignment at lines 974--987
+ [] [] [] [] [] [] [] [] [] 
+ []
+
 
 
 [17]
-File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-12.pdf Graphic file (type pdf)
-<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-3-12.pdf>
-
-
-[18]
-
-[19]
-
-[20]
-Overfull \hbox (7.99498pt too wide) in paragraph at lines 1041--1041
-[]\TU/lmtt/m/n/10 ## Dataset 'garages_parking_rent' does not exist or does not have a 'no._of_floors' column.[] 
+Overfull \hbox (14.10498pt too wide) in alignment at lines 1001--1011
+ [] [] [] [] [] [] [] [] [] 
  []
 
 
 
-[21]
-Overfull \hbox (18.49498pt too wide) in paragraph at lines 1073--1073
-[]\TU/lmtt/m/n/10 ## Dataset 'garages_parking_rent' does not exist or does not have a 'number_of_rooms' column.[] 
- []
-
-
-
-[22] (./statistika_lab_2_kodas.aux)
+[18] (./statistika_lab_2_kodas.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -1039,12 +942,12 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 18973 strings out of 472282
- 351485 string characters out of 5528623
- 892827 words of memory out of 5000000
- 45189 multiletter control sequences out of 15000+600000
- 633358 words of font info for 91 fonts, out of 8000000 for 9000
+ 18901 strings out of 472282
+ 345659 string characters out of 5528623
+ 890077 words of memory out of 5000000
+ 45124 multiletter control sequences out of 15000+600000
+ 633366 words of font info for 92 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 90i,7n,114p,2084b,475s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,7n,114p,693b,481s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on statistika_lab_2_kodas.pdf (22 pages).
+Output written on statistika_lab_2_kodas.pdf (18 pages).
