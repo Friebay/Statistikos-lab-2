@@ -508,6 +508,18 @@ kur:
 - $\mu_{houses}$ - vidutinis namų plotas
 - $\mu_{apartments}$ - vidutinis butų plotas
 
+## Komercinių patalpų ploto ir kainos koreliacija
+
+Nulinė hipotezė ($H_0$): nėra tiesinio ryšio tarp komercinių patalpų ploto ir kainos
+$$H_0: \rho = 0$$
+
+Alternatyvioji hipotezė ($H_1$): egzistuoja statistiškai reikšmingas teigiamas tiesinis ryšys tarp komercinių patalpų ploto ir kainos
+$$H_1: \rho > 0$$
+
+kur:
+
+- $\rho$ - Pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir kainos
+
 ## Privačių pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
 
 Nulinė hipotezė ($H_0$): privačių pardavėjų proporcija butų ir namų rinkose yra vienoda $$H_0: p_{apartments} = p_{houses}$$
@@ -519,10 +531,25 @@ kur:
 $p_{apartments}$ - privačių pardavėjų proporcija butų rinkoje
 $p_{houses}$ - privačių pardavėjų proporcija namų rinkoje
 
+## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacija
+
+Nulinė hipotezė ($H_0$): nėra tiesinio ryšio tarp komercinių patalpų ploto ir peržiūrų skaičiaus
+$$H_0: \rho = 0$$
+
+Alternatyvioji hipotezė ($H_1$): egzistuoja statistiškai reikšmingas tiesinis ryšys tarp komercinių patalpų ploto ir peržiūrų skaičiaus
+$$H_1: \rho \neq 0$$
+
+kur:
+
+- $\rho$ - Pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir peržiūrų skaičiaus
+
+
+
 # Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui.
 
 Namų ir butų dydžių hipotezei naudosime dviejų nepriklausomų imčių t-testą.
-Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų testas (z-testas proporcijoms),
+Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų testas (z-testas proporcijoms).
+Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijos hipotezei naudosime parametrinį Pirsono koreliacijos koeficiento testą.
 
 # Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
 
@@ -591,6 +618,30 @@ apartments_prop <- apartments_private_count / apartments_total
 houses_prop <- houses_private_count / houses_total
 ```
 
+## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijos tyrimas
+```{r}
+# Ištraukiame reikalingus duomenis
+premises_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["premises"]]$area)))
+premises_views <- as.numeric(csv_data_list[["premises"]]$views_total)
+
+# Pašaliname NA ir nelogiškas reikšmes
+valid_data <- !is.na(premises_area) & !is.na(premises_views) & 
+              premises_area > 0 & premises_area < 10000 & 
+              premises_views >= 0
+
+premises_area <- premises_area[valid_data]
+premises_views <- premises_views[valid_data]
+
+# Braižome sklaidos diagramą su regresijos linija
+plot(premises_area, premises_views, 
+     main = "Komercinių patalpų ploto ir peržiūrų skaičiaus ryšys",
+     xlab = "Plotas (kv. m)", 
+     ylab = "Peržiūrų skaičius",
+     pch = 19, 
+     col = "steelblue")
+abline(lm(premises_views ~ premises_area), col = "darkred", lwd = 2)
+```
+
 # Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
 
 ## Namų ir butų dydžių statistinis tyrimas
@@ -616,4 +667,11 @@ prop_test_results <- prop.test(
 print(prop_test_results)
 ```
 
-# Pateikite tyrimo atsakymą.
+## Peržiūrų ir ploto korealiacija
+```{r}
+# Apskaičiuojame Pirsono koreliacijos koeficientą
+correlation <- cor.test(premises_area, premises_views, method = "pearson")
+
+# Spausdiname rezultatus
+print(correlation)
+```
