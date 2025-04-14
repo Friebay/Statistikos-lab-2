@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  14 APR 2025 10:46
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  15 APR 2025 02:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -838,17 +838,20 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 \tf@toc=\write4
 \openout4 = `statistika_lab_2_kodas.toc'.
 
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 164.
 
 
 [1
 
 ]
+LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 164.
+
 
 [2]
 
 [3]
+
+[4]
 Overfull \hbox (7.44pt too wide) in paragraph at lines 357--357
 []|\TU/lmr/m/n/8 Duomenų_rinkinys|  
  []
@@ -863,16 +866,14 @@ Overfull \hbox (19.136pt too wide) in paragraph at lines 362--362
 []|\TU/lmr/m/n/8 garages_parking_rent|  
  []
 
+[5]
 
+[6] [7]
 
-[4] [5] [6]
-
-[7]
+[8]
 File: statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf Graphic file (type pdf)
 <use statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf>
 
-
-[8]
 
 [9]
 File: statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf Graphic file (type pdf)
@@ -880,11 +881,11 @@ File: statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf Graphic 
 
 
 [10]
+
+[11]
 File: statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf Graphic file (type pdf)
 <use statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf>
 
-
-[11]
 
 [12]
 Underfull \vbox (badness 10000) detected at line 739
@@ -902,17 +903,36 @@ Overfull \hbox (11.99498pt too wide) in alignment at lines 765--776
  []
 
 
+
+[14]
 Overfull \hbox (0.33499pt too wide) in alignment at lines 809--826
  [] [] [] [] [] [] [] [] 
  []
 
 
 
-[14]
-
 [15]
 
-[16] (./statistika_lab_2_kodas.aux)
+[16]
+File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file (type pdf)
+<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-1-1.pdf>
+
+
+[17]
+File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-1-2.pdf Graphic file (type pdf)
+<use statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-1-2.pdf>
+
+
+[18]
+
+[19]
+Overfull \hbox (55.24498pt too wide) in paragraph at lines 1072--1072
+[]\TU/lmtt/m/n/10 ## data:  c(apartments_private_count, houses_private_count) out of c(apartments_total, houses_total)[] 
+ []
+
+
+
+[20] (./statistika_lab_2_kodas.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -922,12 +942,12 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 18898 strings out of 472282
- 345579 string characters out of 5528623
- 890948 words of memory out of 5000000
- 45121 multiletter control sequences out of 15000+600000
+ 18946 strings out of 472282
+ 348073 string characters out of 5528623
+ 894991 words of memory out of 5000000
+ 45167 multiletter control sequences out of 15000+600000
  633366 words of font info for 92 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,7n,114p,693b,481s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on statistika_lab_2_kodas.pdf (16 pages).
+Output written on statistika_lab_2_kodas.pdf (20 pages).

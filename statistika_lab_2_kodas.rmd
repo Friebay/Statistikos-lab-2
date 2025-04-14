@@ -491,14 +491,129 @@ kable(rooms_stats,
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-4.  Sudarykite dažnių lenteles kategoriniams kintamiesiems.
+# Sudarykite dažnių lenteles kategoriniams kintamiesiems.
 
-5.  Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
+# Suformuluokite bent 6 tyrimo hipotezes iš savo duomenų rinkinio
 
-6.  Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui. Jei reikia susikurkite naujus kintamuosius iš turimų duomen.
+## Namų ir butų dydžių palyginimas
 
-7.  Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
+Nulinė hipotezė ($H_0$): vidutinės namų ir butų dydžiai yra lygūs
+$$H_0: \mu_{houses} = \mu_{apartments}$$
 
-8.  Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
+Alternatyvioji hipotezė ($H_1$): vidutinis namų dydis yra didesnis nei butų dydis
+$$H_1: \mu_{houses} > \mu_{apartments}$$
 
-9.  Pateikite tyrimo atsakymą.
+kur:
+
+- $\mu_{houses}$ - vidutinis namų plotas
+- $\mu_{apartments}$ - vidutinis butų plotas
+
+## Privačių pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
+
+Nulinė hipotezė ($H_0$): privačių pardavėjų proporcija butų ir namų rinkose yra vienoda $$H_0: p_{apartments} = p_{houses}$$
+
+Alternatyvioji hipotezė ($H_1$): privačių pardavėjų proporcija butų rinkoje skiriasi nuo privačių pardavėjų proporcijos namų rinkoje $$H_1: p_{apartments} \neq p_{houses}$$
+
+kur:
+
+$p_{apartments}$ - privačių pardavėjų proporcija butų rinkoje
+$p_{houses}$ - privačių pardavėjų proporcija namų rinkoje
+
+# Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui.
+
+Namų ir butų dydžių hipotezei naudosime dviejų nepriklausomų imčių t-testą.
+Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų testas (z-testas proporcijoms),
+
+# Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
+
+## Namų ir butų dydžių palyginimo duomenų paruošimas
+```{r}
+# Paruošiame duomenis testui kaip ir anksčiau
+houses_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["houses"]]$area)))
+apartments_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["apartments"]]$area)))
+
+# Pašaliname NA ir galimai neteisingus dydžius
+houses_area <- houses_area[!is.na(houses_area) & houses_area > 0 & houses_area < 1000]
+apartments_area <- apartments_area[!is.na(apartments_area) & apartments_area > 0 & apartments_area < 1000]
+
+# Skirstiniai su histogramomis ir QQ grafikais
+par(mfrow=c(2,2))
+hist(houses_area, main="Namų ploto pasiskirstymas", xlab="Plotas (kv. m)", breaks=25)
+hist(apartments_area, main="Butų ploto pasiskirstymas", xlab="Plotas (kv. m)", breaks=25)
+qqnorm(houses_area, main="Namų ploto QQ grafikas")
+qqline(houses_area)
+qqnorm(apartments_area, main="Butų ploto QQ grafikas")
+qqline(apartments_area)
+
+# Logaritminė transformacija
+log_houses_area <- log(houses_area)
+log_apartments_area <- log(apartments_area)
+
+# Logaritmuotų duomenų patikrinimas
+hist(log_houses_area, main="Log-transformuotas namų plotas", xlab="log(Plotas)", breaks=25)
+hist(log_apartments_area, main="Log-transformuotas butų plotas", xlab="log(Plotas)", breaks=25)
+qqnorm(log_houses_area, main="Log-namų ploto QQ grafikas")
+qqline(log_houses_area)
+qqnorm(log_apartments_area, main="Log-butų ploto QQ grafikas")
+qqline(log_apartments_area)
+par(mfrow=c(1,1))
+```
+
+
+## Pardavėjų proporcija
+```{r}
+# Duomenų paruošimas
+apartments_private <- csv_data_list[["apartments"]]$private_seller
+houses_private <- csv_data_list[["houses"]]$private_seller
+
+# Pašaliname NA reikšmes
+apartments_private <- apartments_private[!is.na(apartments_private)]
+houses_private <- houses_private[!is.na(houses_private)]
+
+if (!is.logical(apartments_private)) {
+  apartments_private <- apartments_private == "True"
+}
+
+if (!is.logical(houses_private)) {
+  houses_private <- houses_private == "True"
+}
+
+# Skaičiuojame privačių pardavėjų kiekį kiekviename rinkos segmente
+apartments_private_count <- sum(apartments_private)
+houses_private_count <- sum(houses_private)
+
+# Bendras kiekvieno segmento dydis
+apartments_total <- length(apartments_private)
+houses_total <- length(houses_private)
+
+# Proporcijų apskaičiavimas
+apartments_prop <- apartments_private_count / apartments_total
+houses_prop <- houses_private_count / houses_total
+```
+
+# Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
+
+## Namų ir butų dydžių statistinis tyrimas
+```{r}
+# Log-transformuoti duomenys
+log_t_test_rezultatas <- t.test(log_houses_area, log_apartments_area, 
+                              alternative = "greater",
+                              var.equal = FALSE)
+
+print(log_t_test_rezultatas)
+```
+
+## Pardavėjų proporcija
+```{r}
+# Dviejų proporcijų testo atlikimas
+prop_test_results <- prop.test(
+  x = c(apartments_private_count, houses_private_count),
+  n = c(apartments_total, houses_total),
+  alternative = "two.sided",
+  correct = TRUE # Taikoma Yates pataisa
+)
+
+print(prop_test_results)
+```
+
+# Pateikite tyrimo atsakymą.
