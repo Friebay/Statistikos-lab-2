@@ -72,14 +72,8 @@ csv_data_list <- list()
 for (folder in folders) {
   file_path <- file.path(data_dir, folder, "all_cities_20240214.csv")
   if (file.exists(file_path)) {
-    # Bandyti nuskaityti failą
-    tryCatch({
-      df <- read.csv(file_path)
-      csv_data_list[[folder]] <- df
-      cat(folder,"eilučių:", nrow(df), ", stulpelių:", ncol(df), "\n")
-    }, error = function(e) {
-      cat("Klaida nuskaitant", folder, ":", conditionMessage(e), "\n")
-    })
+    df <- read.csv(file_path)
+    csv_data_list[[folder]] <- df
   }
 }
 ```
@@ -140,8 +134,6 @@ if (nrow(removal_results) > 0) {
   kable(removal_results, 
         caption = "Išskirčių šalinimo rezultatų suvestinė") %>%
     kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-} else {
-  cat("Duomenyse nerasta kainų, kurios viršytų nustatytas ribas.")
 }
 
 # Patikriname duomenų rinkinių dydžius po valymo
@@ -158,8 +150,6 @@ kable(data_sizes,
 Pašalintos ekstremalios kainos, kurios galėjo iškreipti vidutines reikšmes ir kitas statistines charakteristikas.
 
 ```{r column-analysis}
-# Analizuojame duomenų rinkinių stulpelių struktūrą
-
 # Sukuriame lentelę su stulpelių sąrašais kiekvienam duomenų rinkiniui
 columns_by_dataset <- data.frame(
   Duomenų_rinkinys = character(),
@@ -185,7 +175,7 @@ kable(columns_by_dataset,
                 font_size = 8) %>%
   column_spec(1, width = "8em") %>%
   column_spec(2, width = "8em") %>%
-  column_spec(3, width = "25em")
+  column_spec(3, width = "32em")
 
 # Randame unikalius stulpelių pavadinimus visuose duomenų rinkiniuose
 all_columns <- unique(unlist(lapply(csv_data_list, colnames)))
@@ -205,7 +195,8 @@ column_presence <- column_presence[order(column_presence$Pasikartojimų_skaičiu
 
 # Atvaizduojame unikalių stulpelių analizę
 kable(column_presence, 
-      caption = paste("Unikalių stulpelių pasikartojimas duomenų rinkiniuose (iš viso:", nrow(column_presence), "stulpeliai)"),
+      caption = paste("Unikalių stulpelių pasikartojimas duomenų rinkiniuose (iš viso:",
+                      nrow(column_presence), "stulpeliai)"),
       row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
   scroll_box(width = "100%", height = "300px")
@@ -213,7 +204,7 @@ kable(column_presence,
 
 ## Duomenų vizualizacija
 
-Šiame skyriuje atliksime duomenų vizualinę analizę, kuri padės geriau suprasti Lietuvos nekilnojamojo turto rinkos ypatybes. Naudosime ggplot2 paketą grafikų braižymui.
+Grafikai padės geriau suprasti Lietuvos nekilnojamojo turto rinkos ypatybes.
 
 ```{r visualization-setup}
 # Papildomų vizualizacijai reikalingų paketų įkėlimas
@@ -263,29 +254,6 @@ if ("apartments" %in% names(csv_data_list) && "price" %in% colnames(csv_data_lis
     coord_cartesian(xlim = c(0, 500000))
   
   print(price_hist)
-  
-  # Braižome dėžutės diagramą skirtingoms kainų kategorijoms
-  if ("city" %in% colnames(csv_data_list[["apartments"]])) {
-    # Atrenkame didžiausius miestus
-    top_cities <- names(sort(table(csv_data_list[["apartments"]]$city), decreasing = TRUE)[1:5])
-    
-    # Filtruojame tik pagrindinius miestus
-    df_cities <- csv_data_list[["apartments"]][csv_data_list[["apartments"]]$city %in% top_cities, ]
-    df_cities$city <- factor(df_cities$city, levels = top_cities)
-    
-    # Braižome dėžutės diagramą
-    city_boxplot <- ggplot(df_cities, aes(x = city, y = price, fill = city)) +
-      geom_boxplot(outlier.alpha = 0.3, outlier.size = 1.5) +
-      labs(title = "Butų kainų pasiskirstymas didžiuosiuose miestuose",
-           x = "Miestas",
-           y = "Kaina (EUR)") +
-      theme_scientific() +
-      theme(legend.position = "none",
-            axis.text.x = element_text(angle = 45, hjust = 1)) +
-      scale_y_continuous(labels = comma, limits = c(0, 500000))
-    
-    print(city_boxplot)
-  }
 }
 ```
 
@@ -322,34 +290,31 @@ for (type in premises_types) {
   }
 }
 
-# Jei turime bent vieną patalpų rinkinį
-if (length(premises_data) > 0) {
-  # Sujungiame duomenis, užtikrindami stulpelių suderinamumą
-  if (length(premises_data) == 2) {
-    # Užtikriname, kad stulpeliai abiem šaltiniuose būtų identiški
-    common_cols <- intersect(colnames(premises_data[[1]]), colnames(premises_data[[2]]))
-    premises_data[[1]] <- premises_data[[1]][, common_cols, drop = FALSE]
-    premises_data[[2]] <- premises_data[[2]][, common_cols, drop = FALSE]
-  }
-  
-  # Sujungiame duomenis
-  combined_premises <- do.call(rbind, premises_data)
-  
-  # Braižome dėžutės diagramą
-  area_boxplot <- ggplot(combined_premises, aes(x = type, y = area, fill = type)) +
-    geom_boxplot(outlier.color = "red", outlier.size = 1) +
-    labs(title = "Komercinių patalpų ploto pasiskirstymas",
-         subtitle = "Pardavimo ir nuomos sektoriuose",
-         x = "Sektorius",
-         y = "Plotas (kv. m)") +
-    theme_scientific() +
-    theme(legend.position = "none") +
-    scale_fill_manual(values = c("Pardavimas" = "#619CFF", "Nuoma" = "#00BA38")) +
-    scale_y_continuous(labels = comma) +
-    coord_cartesian(ylim = c(0, 500))
-  
-  print(area_boxplot)
+# Sujungiame duomenis, užtikrindami stulpelių suderinamumą
+if (length(premises_data) == 2) {
+  # Užtikriname, kad stulpeliai abiem šaltiniuose būtų identiški
+  common_cols <- intersect(colnames(premises_data[[1]]), colnames(premises_data[[2]]))
+  premises_data[[1]] <- premises_data[[1]][, common_cols, drop = FALSE]
+  premises_data[[2]] <- premises_data[[2]][, common_cols, drop = FALSE]
 }
+
+# Sujungiame duomenis
+combined_premises <- do.call(rbind, premises_data)
+
+# Braižome boxplot
+area_boxplot <- ggplot(combined_premises, aes(x = type, y = area, fill = type)) +
+  geom_boxplot(outlier.color = "red", outlier.size = 1) +
+  labs(title = "Komercinių patalpų ploto pasiskirstymas",
+       subtitle = "Pardavimo ir nuomos sektoriuose",
+       x = "Sektorius",
+       y = "Plotas (kv. m)") +
+  theme_scientific() +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c("Pardavimas" = "#619CFF", "Nuoma" = "#00BA38")) +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1250))
+
+print(area_boxplot)
 ```
 
 ### Namų nuomos kainos ryšys su plotu
@@ -374,7 +339,7 @@ if ("house_rent" %in% names(csv_data_list) &&
   
   # Apskaičiuojame kainą už kvadratinį metrą
   df$price_per_sqm <- df$price / df$area
-    # Braižome taškinę diagramą su regresijos linija
+    # Braižome sklaidos diagramą su regresijos linija
   scatter_plot <- ggplot(df, aes(x = area, y = price)) +
     geom_point(alpha = 0.7, color = "steelblue") +
     geom_smooth(method = "lm", color = "darkred", se = FALSE) +
@@ -399,31 +364,7 @@ if ("house_rent" %in% names(csv_data_list) &&
 
 ## Kiekybinių kintamųjų aprašomoji statistika
 
-Šiame skyriuje pateikiamos pagrindinės skaitinės charakteristikos kiekybiniams nekilnojamojo turto rinkos kintamiesiems. Kiekvieno kintamojo aprašomoji statistika apima:
-
-- Centrinės tendencijos matus:
-  - Aritmetinis vidurkis (Mean)
-  - Mediana (Median)
-  - Moda (Mode)
-  
-- Sklaidos matus:
-  - Dispersija (Variance)
-  - Standartinis nuokrypis (Standard deviation)
-  - Kvartiliai (Quartiles) - Q1 (25%), Q2 (50%), Q3 (75%)
-  - Minimalios ir maksimalios reikšmės (Min, Max)
-
-Analizei atrinkti šie kiekybiniai kintamieji:
-
-1. Kaina (price) - nekilnojamojo turto kaina EUR
-2. Mėnesinė nuomos kaina (price_per_month) - EUR/mėn
-3. Peržiūrų skaičius (views_total) - skelbimo peržiūrų kiekis
-4. Būsto plotas (area) - kvadratiniais metrais
-5. Žemės plotas (area_.a.) - arais
-6. Statybos metai (build_year)
-7. Aukštų skaičius (no._of_floors)
-8. Buto aukštas (floor)
-9. Kambarių skaičius (number_of_rooms)
-10. Sklypo plotas (plot_area)
+Šiame skyriuje pateikiamos pagrindinės skaitinės charakteristikos kiekybiniams kintamiesiems.
 
 ```{r statistical_helpers}
 
@@ -432,14 +373,6 @@ Analizei atrinkti šie kiekybiniai kintamieji:
 filter_datasets_by_column <- function(data_list, column_name) {
   filtered <- data_list[sapply(data_list, function(df) column_name %in% colnames(df))]
   return(filtered)
-}
-
-# Modos skaičiavimo funkcija
-
-get_mode <- function(v) {
-  uniqv <- na.omit(unique(v))
-  if (length(uniqv) == 0) return(NA)
-  return(uniqv[which.max(tabulate(match(v, uniqv)))])
 }
 
 # Statistikų skaičiavimas kintamajam
@@ -458,7 +391,6 @@ calculate_summary <- function(data_list, variable_name, target_datasets) {
     stringsAsFactors = FALSE
   )
   
-  # Ciklas per nurodytus duomenų rinkinius
   for (df_name in target_datasets) {
     if (df_name %in% names(data_list) && variable_name %in% colnames(data_list[[df_name]])) {
       # Išskiriame reikšmes ir konvertuojame į skaitinius duomenis
@@ -469,14 +401,10 @@ calculate_summary <- function(data_list, variable_name, target_datasets) {
       clean_values <- numeric_values[!is.na(numeric_values)]
       
       if (length(clean_values) > 0) {
-        # Gauname statistikas iš R summary funkcijos
-        summ <- summary(clean_values)
         
         # Apskaičiuojame papildomas statistikas
-        n_val <- length(clean_values)
         mean_val <- mean(clean_values)
         median_val <- median(clean_values)
-        mode_val <- get_mode(clean_values)
         sd_val <- sd(clean_values)
         quant_vals <- quantile(clean_values, probs = c(0.25, 0.5, 0.75))
         min_val <- min(clean_values)
@@ -487,7 +415,6 @@ calculate_summary <- function(data_list, variable_name, target_datasets) {
           Duomenų_rinkinys = df_name,
           Vidurkis = mean_val,
           Mediana = median_val,
-          Moda = as.character(mode_val),
           Stand_nuokr = sd_val,
           Q1 = quant_vals[1],
           Q3 = quant_vals[3],
@@ -523,62 +450,45 @@ rent_datasets <- c("apartments_rent", "house_rent", "premises_rent")
 all_datasets <- c("apartments", "apartments_rent", "garages_parking", "garages_parking_rent", 
                 "house_rent", "houses", "land", "land_rent", "premises", "premises_rent")
 
-# Apskaičiuojame kainos statistikas pardavimo duomenims
 sale_price_stats <- calculate_summary(csv_data_list, "price", sale_datasets)
-
-# Apskaičiuojame kainos statistikas nuomos duomenims
 rent_price_stats <- calculate_summary(csv_data_list, "price", rent_datasets)
-
-# Atvaizduojame rezultatus lentelėse
-if (nrow(sale_price_stats) > 0) {
-  # Pašaliname indekso stulpelį, kuris rodo "25%"
-  kable(sale_price_stats, 
-        caption = "Pardavimų kainų statistika pagal nekilnojamojo turto tipą", 
-        digits = 2,
-        row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-}
-
-if (nrow(rent_price_stats) > 0) {
-  # Pašaliname indekso stulpelį, kuris rodo "25%"
-  kable(rent_price_stats, 
-        caption = "Nuomos kainų statistika pagal nekilnojamojo turto tipą", 
-        digits = 2,
-        row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-}
-```
-
-```{r other_statistics}
-# Apskaičiuojame statistikas kitoms svarbiausioms charakteristikoms
 views_stats <- calculate_summary(csv_data_list, "views_total", all_datasets)
 floors_stats <- calculate_summary(csv_data_list, "no._of_floors", all_datasets)
 rooms_stats <- calculate_summary(csv_data_list, "number_of_rooms", all_datasets)
 
+
 # Atvaizduojame rezultatus lentelėse
-if (nrow(views_stats) > 0) {
-  kable(views_stats, 
-        caption = "Peržiūrų skaičiaus statistika pagal nekilnojamojo turto tipą", 
-        digits = 0,
-        row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-}
+kable(sale_price_stats, 
+      caption = "Pardavimų kainų statistika pagal nekilnojamojo turto tipą", 
+      digits = 2,
+      row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
-if (nrow(floors_stats) > 0) {
-  kable(floors_stats, 
-        caption = "Aukštų skaičiaus statistika pagal nekilnojamojo turto tipą", 
-        digits = 1,
-        row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-}
+kable(rent_price_stats, 
+      caption = "Nuomos kainų statistika pagal nekilnojamojo turto tipą", 
+      digits = 2,
+      row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
-if (nrow(rooms_stats) > 0) {
-  kable(rooms_stats, 
-        caption = "Kambarių skaičiaus statistika pagal nekilnojamojo turto tipą", 
-        digits = 1,
-        row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-}
+kable(views_stats, 
+      caption = "Peržiūrų skaičiaus statistika pagal nekilnojamojo turto tipą", 
+      digits = 0,
+      row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+kable(floors_stats, 
+      caption = "Aukštų skaičiaus statistika pagal nekilnojamojo turto tipą", 
+      digits = 1,
+      row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+kable(rooms_stats, 
+      caption = "Kambarių skaičiaus statistika pagal nekilnojamojo turto tipą", 
+      digits = 1,
+      row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 4.  Sudarykite dažnių lenteles kategoriniams kintamiesiems.

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  13 APR 2025 18:51
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  14 APR 2025 10:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -498,10 +498,13 @@ LaTeX Warning: Label `tab:column-analysis' multiply defined.
 LaTeX Warning: Label `tab:price_statistics' multiply defined.
 
 
-LaTeX Warning: Label `tab:other_statistics' multiply defined.
+LaTeX Warning: Label `tab:price_statistics' multiply defined.
 
 
-LaTeX Warning: Label `tab:other_statistics' multiply defined.
+LaTeX Warning: Label `tab:price_statistics' multiply defined.
+
+
+LaTeX Warning: Label `tab:price_statistics' multiply defined.
 
 )
 \openout1 = `statistika_lab_2_kodas.aux'.
@@ -846,93 +849,70 @@ LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 [2]
 
 [3]
-
-[4]
-Overfull \hbox (7.44pt too wide) in paragraph at lines 380--380
+Overfull \hbox (7.44pt too wide) in paragraph at lines 357--357
 []|\TU/lmr/m/n/8 Duomenų_rinkinys|  
  []
 
 
-Overfull \hbox (4.304pt too wide) in paragraph at lines 380--380
+Overfull \hbox (4.304pt too wide) in paragraph at lines 357--357
  []|\TU/lmr/m/n/8 Stulpelių_skaičius|
  []
 
 
-Overfull \hbox (19.136pt too wide) in paragraph at lines 385--385
+Overfull \hbox (19.136pt too wide) in paragraph at lines 362--362
 []|\TU/lmr/m/n/8 garages_parking_rent|  
  []
 
-[5] [6] [7]
 
-[8]
 
-[9]
+[4] [5] [6]
+
+[7]
 File: statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf Graphic file (type pdf)
 <use statistika_lab_2_kodas_files/figure-latex/price-distribution-1.pdf>
 
 
-[10]
-Underfull \vbox (badness 10000) detected at line 647
- []
+[8]
 
-
-Underfull \vbox (badness 10000) detected at line 647
- []
-
-
-
-[11]
+[9]
 File: statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf Graphic file (type pdf)
 <use statistika_lab_2_kodas_files/figure-latex/area-distribution-1.pdf>
 
 
-[12]
+[10]
 File: statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf Graphic file (type pdf)
 <use statistika_lab_2_kodas_files/figure-latex/price-area-relationship-1.pdf>
 
 
+[11]
+
+[12]
+Underfull \vbox (badness 10000) detected at line 739
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 739
+ []
+
+
+
 [13]
+Overfull \hbox (11.99498pt too wide) in alignment at lines 765--776
+ [] [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (0.33499pt too wide) in alignment at lines 809--826
+ [] [] [] [] [] [] [] [] 
+ []
+
+
 
 [14]
-Underfull \vbox (badness 10000) detected at line 860
- []
-
-
-Underfull \vbox (badness 10000) detected at line 860
- []
-
-
 
 [15]
-Overfull \hbox (53.99498pt too wide) in alignment at lines 888--899
- [] [] [] [] [] [] [] [] [] 
- []
 
-
-Overfull \hbox (36.78497pt too wide) in alignment at lines 914--923
- [] [] [] [] [] [] [] [] [] 
- []
-
-[16]
-Overfull \hbox (37.34499pt too wide) in alignment at lines 943--960
- [] [] [] [] [] [] [] [] [] 
- []
-
-
-Overfull \hbox (14.10498pt too wide) in alignment at lines 974--987
- [] [] [] [] [] [] [] [] [] 
- []
-
-
-
-[17]
-Overfull \hbox (14.10498pt too wide) in alignment at lines 1001--1011
- [] [] [] [] [] [] [] [] [] 
- []
-
-
-
-[18] (./statistika_lab_2_kodas.aux)
+[16] (./statistika_lab_2_kodas.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -942,12 +922,12 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 18901 strings out of 472282
- 345659 string characters out of 5528623
- 890077 words of memory out of 5000000
- 45124 multiletter control sequences out of 15000+600000
+ 18898 strings out of 472282
+ 345579 string characters out of 5528623
+ 890948 words of memory out of 5000000
+ 45121 multiletter control sequences out of 15000+600000
  633366 words of font info for 92 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,7n,114p,693b,481s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on statistika_lab_2_kodas.pdf (18 pages).
+Output written on statistika_lab_2_kodas.pdf (16 pages).
