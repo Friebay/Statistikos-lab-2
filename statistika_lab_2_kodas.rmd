@@ -3,12 +3,6 @@ title: "Nekilnojamojo turto objektų kainų analizė Lietuvoje"
 author: "VU"
 date: "2025-04-17"
 output:
-  pdf_document:
-    toc: true
-    toc_depth: 3
-    number_sections: true
-    latex_engine: xelatex
-    fig_caption: true
   html_document:
     toc: true
     toc_depth: 3
@@ -20,6 +14,12 @@ output:
   word_document:
     toc: true
     toc_depth: '3'
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    latex_engine: xelatex
+    fig_caption: true
 subtitle: Statistikos laboratorinis darbas Nr. 2
 ---
 
@@ -35,11 +35,14 @@ knitr::opts_chunk$set(
   dpi = 300               # Grafikų rezoliucija
 )
 
-# Pagrindinių paketų įkėlimas
+# Paketų užrovimas
 library(ggplot2)
 library(dplyr)
 library(knitr)
 library(kableExtra)
+library(scales)
+library(gridExtra)
+library(ggExtra)
 ```
 
 # Įvadas
@@ -207,12 +210,6 @@ kable(column_presence,
 Grafikai padės geriau suprasti Lietuvos nekilnojamojo turto rinkos ypatybes.
 
 ```{r visualization-setup}
-# Papildomų vizualizacijai reikalingų paketų įkėlimas
-library(ggplot2)
-library(scales)
-library(gridExtra)
-library(ggExtra)
-
 # Nustatome bendrą grafikų stilių
 theme_scientific <- function() {
   theme_minimal() +
@@ -229,7 +226,7 @@ theme_scientific <- function() {
 
 ### Kainų pasiskirstymo analizė
 
-Pirmiausiai analizuojame butų kainų pasiskirstymą, siekdami nustatyti kainų tendencijas ir išsibarstymo charakteristikas.
+Analizuojame butų kainų pasiskirstymą, siekdami nustatyti kainų tendencijas ir išsibarstymo charakteristikas.
 
 ```{r price-distribution}
 # Butų kainų pasiskirstymo vizualizacija
@@ -364,7 +361,7 @@ if ("house_rent" %in% names(csv_data_list) &&
 
 ## Kiekybinių kintamųjų aprašomoji statistika
 
-Šiame skyriuje pateikiamos pagrindinės skaitinės charakteristikos kiekybiniams kintamiesiems.
+Pateikiame pagrindinės skaitines charakteristikas kiekybiniams kintamiesiems.
 
 ```{r statistical_helpers}
 
@@ -508,19 +505,7 @@ kur:
 - $\mu_{houses}$ - vidutinis namų plotas
 - $\mu_{apartments}$ - vidutinis butų plotas
 
-## Komercinių patalpų ploto ir kainos koreliacija
-
-Nulinė hipotezė ($H_0$): nėra tiesinio ryšio tarp komercinių patalpų ploto ir kainos
-$$H_0: \rho = 0$$
-
-Alternatyvioji hipotezė ($H_1$): egzistuoja statistiškai reikšmingas teigiamas tiesinis ryšys tarp komercinių patalpų ploto ir kainos
-$$H_1: \rho > 0$$
-
-kur:
-
-- $\rho$ - Pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir kainos
-
-## Privačių pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
+## Pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
 
 Nulinė hipotezė ($H_0$): privačių pardavėjų proporcija butų ir namų rinkose yra vienoda $$H_0: p_{apartments} = p_{houses}$$
 
@@ -541,15 +526,13 @@ $$H_1: \rho \neq 0$$
 
 kur:
 
-- $\rho$ - Pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir peržiūrų skaičiaus
-
-
+- $\rho$ - pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir peržiūrų skaičiaus
 
 # Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui.
 
 Namų ir butų dydžių hipotezei naudosime dviejų nepriklausomų imčių t-testą.
-Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų testas (z-testas proporcijoms).
-Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijos hipotezei naudosime parametrinį Pirsono koreliacijos koeficiento testą.
+Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų z-testą.
+Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijai naudosime Pirsono koreliacijos koeficiento testą.
 
 # Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
 
@@ -587,7 +570,7 @@ par(mfrow=c(1,1))
 ```
 
 
-## Pardavėjų proporcija
+##  Pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
 ```{r}
 # Duomenų paruošimas
 apartments_private <- csv_data_list[["apartments"]]$private_seller
@@ -631,32 +614,29 @@ valid_data <- !is.na(premises_area) & !is.na(premises_views) &
 
 premises_area <- premises_area[valid_data]
 premises_views <- premises_views[valid_data]
-
-# Braižome sklaidos diagramą su regresijos linija
-plot(premises_area, premises_views, 
-     main = "Komercinių patalpų ploto ir peržiūrų skaičiaus ryšys",
-     xlab = "Plotas (kv. m)", 
-     ylab = "Peržiūrų skaičius",
-     pch = 19, 
-     col = "steelblue")
-abline(lm(premises_views ~ premises_area), col = "darkred", lwd = 2)
 ```
 
 # Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
 
 ## Namų ir butų dydžių statistinis tyrimas
 ```{r}
-# Log-transformuoti duomenys
-log_t_test_rezultatas <- t.test(log_houses_area, log_apartments_area, 
-                              alternative = "greater",
-                              var.equal = FALSE)
+t_test_rezultatas <- t.test(
+  houses_area, apartments_area, 
+  alternative = "greater",
+  var.equal = FALSE)
+
+print(t_test_rezultatas)
+
+log_t_test_rezultatas <- t.test(
+  log_houses_area, log_apartments_area, 
+  alternative = "greater",
+  var.equal = FALSE)
 
 print(log_t_test_rezultatas)
 ```
 
-## Pardavėjų proporcija
+##  Pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
 ```{r}
-# Dviejų proporcijų testo atlikimas
 prop_test_results <- prop.test(
   x = c(apartments_private_count, houses_private_count),
   n = c(apartments_total, houses_total),
@@ -669,9 +649,35 @@ print(prop_test_results)
 
 ## Peržiūrų ir ploto korealiacija
 ```{r}
-# Apskaičiuojame Pirsono koreliacijos koeficientą
-correlation <- cor.test(premises_area, premises_views, method = "pearson")
+correlation <- cor.test(
+  premises_area, premises_views, method = "pearson")
 
-# Spausdiname rezultatus
 print(correlation)
 ```
+# Pateikite tyrimo atsakymą
+## Namų ir butų dydžių palyginimas
+```{r}
+alpha <- 0.05  # reikšmingumo lygis
+df <- 13262    # laisvės laipsnių skaičius
+critical_t <- qt(1 - alpha, df)
+critical_t
+```
+Kadangi $t = 92.856 > 1.645 = t_{0.05(13262)}$, tai padarome išvadą, kad namų ir butų plotų vidurkių (t.y. $137.188$ ir $56.292$) skirtumas yra statistiškai reikšmingas ($H_0$ atmetame). Namų vidutinis plotas yra reikšmingai didesnis nei butų vidutinis plotas. Tai rodo, kad namai paprastai yra didesni nei butai.
+
+## Pardavėjų proporcijos palyginimas tarp butų ir namų rinkų
+```{r}
+alpha <- 0.05
+df <- 1       
+critical_chi_sq <- qchisq(1 - alpha, df)
+critical_chi_sq
+```
+Kadangi $\chi^2 = 1.6181 < 3.841 = \chi^2_{0.05(1)}$, tai padarome išvadą, kad privačių pardavėjų proporcijų skirtumas tarp butų ir namų rinkų nėra statistiškai reikšmingas ($H_0$ negalime atmesti). Tai reiškia, kad privačių pardavėjų proporcijos abiejose rinkose yra panašios.
+
+## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacija
+```{r}
+alpha <- 0.05 
+df <- 1474
+critical_T <- qt(1 - alpha, df)
+critical_T
+```
+Kadangi $T = 4.166 > 1.646 = t_{0.05(1474)}$, tai padarome išvadą, kad koreliacijos koeficientas yra statistiškai reikšmingas ($H_0$ atmetame). Koreliacijos koeficientas ($r = 0.1079$) rodo silpną, bet reikšmingą teigiamą ryšį tarp komercinių patalpų ploto ir peržiūrų skaičiaus.
