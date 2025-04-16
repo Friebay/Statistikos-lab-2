@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  15 APR 2025 09:16
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.4.13)  15 APR 2025 09:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -923,7 +923,7 @@ File: statistika_lab_2_kodas_files/figure-latex/unnamed-chunk-1-2.pdf Graphic fi
 [19]
 
 [20]
-Overfull \hbox (55.24498pt too wide) in paragraph at lines 1129--1129
+Overfull \hbox (55.24498pt too wide) in paragraph at lines 1111--1111
 []\TU/lmtt/m/n/10 ## data:  c(apartments_private_count, houses_private_count) out of c(apartments_total, houses_total)[] 
  []
 
@@ -941,11 +941,11 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 18956 strings out of 472282
- 348469 string characters out of 5528623
- 895393 words of memory out of 5000000
- 45177 multiletter control sequences out of 15000+600000
- 633366 words of font info for 92 fonts, out of 8000000 for 9000
+ 18964 strings out of 472282
+ 348672 string characters out of 5528623
+ 895457 words of memory out of 5000000
+ 45181 multiletter control sequences out of 15000+600000
+ 633382 words of font info for 94 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,7n,114p,693b,481s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

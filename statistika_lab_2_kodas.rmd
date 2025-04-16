@@ -3,6 +3,15 @@ title: "Nekilnojamojo turto objektų kainų analizė Lietuvoje"
 author: "VU"
 date: "2025-04-17"
 output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    latex_engine: xelatex
+    fig_caption: true
+  word_document:
+    toc: true
+    toc_depth: '3'
   html_document:
     toc: true
     toc_depth: 3
@@ -11,15 +20,6 @@ output:
     fig_caption: true
     df_print: paged
     code_folding: show
-  word_document:
-    toc: true
-    toc_depth: '3'
-  pdf_document:
-    toc: true
-    toc_depth: 3
-    number_sections: true
-    latex_engine: xelatex
-    fig_caption: true
 subtitle: Statistikos laboratorinis darbas Nr. 2
 ---
 
@@ -516,23 +516,38 @@ kur:
 $p_{apartments}$ - privačių pardavėjų proporcija butų rinkoje
 $p_{houses}$ - privačių pardavėjų proporcija namų rinkoje
 
-## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacija
+## Komercinių patalpų ploto dispersijų palyginimas
 
-Nulinė hipotezė ($H_0$): nėra tiesinio ryšio tarp komercinių patalpų ploto ir peržiūrų skaičiaus
-$$H_0: \rho = 0$$
+Nulinė hipotezė ($H_0$): komercinių patalpų ploto dispersijos pardavimo ir nuomos sektoriuose yra lygios
+$$H_0: \sigma^2_{premises} = \sigma^2_{premises\_rent}$$
 
-Alternatyvioji hipotezė ($H_1$): egzistuoja statistiškai reikšmingas tiesinis ryšys tarp komercinių patalpų ploto ir peržiūrų skaičiaus
-$$H_1: \rho \neq 0$$
+Alternatyvioji hipotezė ($H_1$): komercinių patalpų ploto dispersijos pardavimo ir nuomos sektoriuose skiriasi
+$$H_1: \sigma^2_{premises} \neq \sigma^2_{premises\_rent}$$
 
 kur:
 
-- $\rho$ - pirsono koreliacijos koeficientas tarp komercinių patalpų ploto ir peržiūrų skaičiaus
+- $\sigma^2_{premises}$ - komercinių patalpų ploto dispersija pardavimo sektoriuje
+- $\sigma^2_{premises\_rent}$ - komercinių patalpų ploto dispersija nuomos sektoriuje
+
+## Renovuotų ir nerenovuotų nuomuojamų butų kaina
+
+Nulinė hipotezė ($H_0$): Renovuotų ir nerenovuotų butų nuomos kainos vidurkiai yra vienodi.
+$$H_0: \mu_{renovated} = \mu_{non_renovated}$$
+
+Alternatyvioji hipotezė ($H_1$): Renovuotų butų nuomos kainos vidurkis yra didesnis nei nerenovuotų butų nuomos kainos vidurkis.
+$$H_1: \mu_{renovated} > \mu_{non_renovated}$$
+
+Kur:
+
+$\mu_{renovated}$ - renovuotų butų nuomos kainos vidurkis.
+$\mu_{non_renovated}$ - nerenovuotų butų nuomos kainos vidurkis.
 
 # Užrašykite kokius testus parinkote savo tyrimo hipotezėms. Hipotezės turi būti skirtos skirtingų testų naudojimui.
 
 Namų ir butų dydžių hipotezei naudosime dviejų nepriklausomų imčių t-testą.
 Privačių pardavėjų proporcijų palyginimui naudosime dviejų proporcijų z-testą.
-Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijai naudosime Pirsono koreliacijos koeficiento testą.
+Komercinių patalpų ploto dispersijų palyginimui naudosime F-testą.
+Renovuotų ir nerenovuotų butų nuomos kainų palyginimui naudosime porinį t-testą.
 
 # Patikrinkite, ar kintamieji tenkina būtinas sąlygas testų taikymui. Jei netenkina, atlikite duomenų transformacijas.
 
@@ -601,31 +616,180 @@ apartments_prop <- apartments_private_count / apartments_total
 houses_prop <- houses_private_count / houses_total
 ```
 
-## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacijos tyrimas
+## Komercinių patalpų ploto dispersijų palyginimas
 ```{r}
 # Ištraukiame reikalingus duomenis
 premises_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["premises"]]$area)))
-premises_views <- as.numeric(csv_data_list[["premises"]]$views_total)
+premises_rent_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["premises_rent"]]$area)))
 
 # Pašaliname NA ir nelogiškas reikšmes
-valid_data <- !is.na(premises_area) & !is.na(premises_views) & 
-              premises_area > 0 & premises_area < 10000 & 
-              premises_views >= 0
+premises_area <- premises_area[!is.na(premises_area) & premises_area > 0 & premises_area < 10000]
+premises_rent_area <- premises_rent_area[!is.na(premises_rent_area) & premises_rent_area > 0 & premises_rent_area < 10000]
+```
 
-premises_area <- premises_area[valid_data]
-premises_views <- premises_views[valid_data]
+## Renovuotų ir nerenovuotų nuomuojamų butų kaina
+```{r}
+# Filtruojame ir atspausdiname renovuotus ir nerenovuotus butus su jų kainomis
+build_year_data <- csv_data_list[["apartments_rent"]]$build_year
+price_data <- csv_data_list[["apartments_rent"]]$price
+
+# Sukuriame pilną duomenų rinkinį
+full_data <- data.frame(
+  build_year = build_year_data,
+  price = price_data
+)
+  # Identifikuojame renovuotus butus ir ištraukiame jų statybos metus
+renovated_data <- data.frame(
+  build_year = character(0),
+  price = numeric(0),
+  construction_year = numeric(0)
+)
+
+for (i in 1:nrow(full_data)) {
+  x <- as.character(full_data$build_year[i])
+  if (grepl("construction", x) && grepl("renovation", x)) {
+    construction_year <- as.numeric(substr(x, 1, 4))
+    renovation_year <- as.numeric(substr(x, regexpr("renovation", x) - 5, regexpr("renovation", x) - 2))
+    if (!is.na(construction_year) && !is.na(renovation_year) && construction_year < 2000 && renovation_year > 2010) {
+      renovated_data <- rbind(renovated_data, data.frame(
+        build_year = x,
+        price = full_data$price[i],
+        construction_year = construction_year
+      ))
+    }
+  }
+}
+
+# Pervardijame renovuotų butų stulpelius
+if (nrow(renovated_data) > 0) {
+  colnames(renovated_data)[1:2] <- c("build_year_renovated", "price_renovated")
+}
+
+# Identifikuojame nerenovuotus butus ir ištraukiame jų statybos metus
+non_renovated_data <- data.frame(
+  build_year = character(0),
+  price = numeric(0),
+  construction_year = numeric(0)
+)
+
+for (i in 1:nrow(full_data)) {
+  x <- as.character(full_data$build_year[i])
+  if (!grepl("renovation", x)) {
+    # Jei statybos metai pateikti kaip skaičius
+    if (grepl("^\\d{4}$", x)) {
+      construction_year <- as.numeric(x)
+      if (!is.na(construction_year)) {
+        non_renovated_data <- rbind(non_renovated_data, data.frame(
+          build_year = x,
+          price = full_data$price[i],
+          construction_year = construction_year
+        ))
+      }
+    } else if (grepl("construction", x)) {
+      # Jei yra "construction" formatas
+      construction_year <- as.numeric(substr(x, 1, 4))
+      if (!is.na(construction_year)) {
+        non_renovated_data <- rbind(non_renovated_data, data.frame(
+          build_year = x,
+          price = full_data$price[i],
+          construction_year = construction_year
+        ))
+      }
+    }
+  }
+}
+
+# Pervardijame nerenovuotų butų stulpelius
+if (nrow(non_renovated_data) > 0) {
+  colnames(non_renovated_data)[1:2] <- c("build_year_non_renovated", "price_non_renovated")
+}
+
+# Sukuriame lentelę rezultatams
+combined_data <- data.frame(
+  ID_Renovuoto = numeric(nrow(renovated_data)),
+  Statybos_Metai_Renovuoto = character(nrow(renovated_data)),
+  Statybos_Metai_Skaicius_Renovuoto = numeric(nrow(renovated_data)),
+  Kaina_Renovuoto = numeric(nrow(renovated_data)),
+  ID_Nerenovuoto = numeric(nrow(renovated_data)),
+  Statybos_Metai_Skaicius_Nerenovuoto = numeric(nrow(renovated_data)),
+  Kaina_Nerenovuoto = numeric(nrow(renovated_data))
+)
+
+# Užpildome lentelę duomenimis
+for (i in 1:nrow(renovated_data)) {
+  target_year <- renovated_data$construction_year[i]
+  
+  # Randame nerenovuotus butus su tokiais pačiais statybos metais
+  matching_indices <- which(non_renovated_data$construction_year == target_year)
+    if (length(matching_indices) > 0) {
+    # Jei yra sutampančių statybos metų, parenkame atsitiktinį butą iš jų
+    random_idx <- sample(matching_indices, 1)
+  } else {
+    # Jei nėra sutampančių statybos metų, praleidžiame šį renovuotą butą
+    next
+  }
+  
+  # Užpildome duomenis
+  combined_data[i, "ID_Renovuoto"] <- i
+  combined_data[i, "Statybos_Metai_Renovuoto"] <- as.character(renovated_data[i, "build_year_renovated"])
+  combined_data[i, "Statybos_Metai_Skaicius_Renovuoto"] <- renovated_data$construction_year[i]
+  combined_data[i, "Kaina_Renovuoto"] <- renovated_data[i, "price_renovated"]
+  
+  combined_data[i, "ID_Nerenovuoto"] <- random_idx
+  combined_data[i, "Statybos_Metai_Skaicius_Nerenovuoto"] <- non_renovated_data$construction_year[random_idx]
+  combined_data[i, "Kaina_Nerenovuoto"] <- non_renovated_data[random_idx, "price_non_renovated"]
+}
+
+# Pašaliname eilutes su NA reikšmėmis
+combined_data_clean <- combined_data[complete.cases(combined_data), ]
+
+# Papildomai pašaliname eilutes, kur Kaina_Renovuoto yra 0
+combined_data_clean <- combined_data_clean[combined_data_clean$Kaina_Renovuoto > 0, ]
+
+# Renovuotų ir nerenovuotų butų kainų porinis t-testas
+
+# Atliksime porinį t-testą naudodami jau paruoštus duomenis iš combined_data_clean
+# Porinis t-testas tinka, nes turime poras: renovuotas butas ir nerenovuotas butas su tokiais pačiais statybos metais
+
+# Tikriname ar duomenys tenkina normalumo prielaidą
+par(mfrow=c(2,2))
+hist(combined_data_clean$Kaina_Renovuoto, main="Renovuotų butų kainų pasiskirstymas", 
+     xlab="Kaina (EUR)", col="lightblue")
+hist(combined_data_clean$Kaina_Nerenovuoto, main="Nerenovuotų butų kainų pasiskirstymas", 
+     xlab="Kaina (EUR)", col="lightgreen")
+
+# QQ grafikai
+qqnorm(combined_data_clean$Kaina_Renovuoto, main="Renovuotų butų QQ grafikas")
+qqline(combined_data_clean$Kaina_Renovuoto)
+qqnorm(combined_data_clean$Kaina_Nerenovuoto, main="Nerenovuotų butų QQ grafikas")
+qqline(combined_data_clean$Kaina_Nerenovuoto)
+
+# Patikrinkime ar reikia logaritminės transformacijos
+# Jei duomenys stipriai nukrypsta nuo normalumo, galima taikyti logaritminę transformaciją
+log_kaina_renovuoto <- log(combined_data_clean$Kaina_Renovuoto)
+log_kaina_nerenovuoto <- log(combined_data_clean$Kaina_Nerenovuoto)
+
+hist(log_kaina_renovuoto, main="Log-transformuotos renovuotų butų kainos", 
+     xlab="ln(Kaina)", col="lightblue")
+hist(log_kaina_nerenovuoto, main="Log-transformuotos nerenovuotų butų kainos", 
+     xlab="ln(Kaina)", col="lightgreen")
+
+qqnorm(log_kaina_renovuoto, main="Log-renovuotų butų QQ grafikas")
+qqline(log_kaina_renovuoto)
+qqnorm(log_kaina_nerenovuoto, main="Log-nerenovuotų butų QQ grafikas")
+qqline(log_kaina_nerenovuoto)
 ```
 
 # Atlikite statistinį tyrimą savo suformuluotoms hipotezėms.
 
 ## Namų ir butų dydžių statistinis tyrimas
 ```{r}
-t_test_rezultatas <- t.test(
-  houses_area, apartments_area, 
-  alternative = "greater",
-  var.equal = FALSE)
-
-print(t_test_rezultatas)
+# t_test_rezultatas <- t.test(
+#   houses_area, apartments_area, 
+#   alternative = "greater",
+#   var.equal = FALSE)
+# 
+# print(t_test_rezultatas)
 
 log_t_test_rezultatas <- t.test(
   log_houses_area, log_apartments_area, 
@@ -647,13 +811,27 @@ prop_test_results <- prop.test(
 print(prop_test_results)
 ```
 
-## Peržiūrų ir ploto korealiacija
+## Komercinių patalpų ploto dispersijų palyginimas
 ```{r}
-correlation <- cor.test(
-  premises_area, premises_views, method = "pearson")
+f_test_results <- var.test(
+  premises_area, premises_rent_area, alternative = "two.sided")
 
-print(correlation)
+print(f_test_results)
 ```
+
+## Butų palyginimas
+```{r}
+# Atliekame porinį t-testą originaliems duomenims
+t_test_result <- t.test(
+  combined_data_clean$Kaina_Renovuoto, 
+  combined_data_clean$Kaina_Nerenovuoto, 
+  alternative = "greater",  # Tikriname ar renovuotų butų kainos didesnės
+  paired = TRUE             # Porinis testas, nes lyginama tos pačios statybos metų butai
+)
+
+print(t_test_result)
+```
+
 # Pateikite tyrimo atsakymą
 ## Namų ir butų dydžių palyginimas
 ```{r}
@@ -671,13 +849,30 @@ df <- 1
 critical_chi_sq <- qchisq(1 - alpha, df)
 critical_chi_sq
 ```
-Kadangi $\chi^2 = 1.6181 < 3.841 = \chi^2_{0.05(1)}$, tai padarome išvadą, kad privačių pardavėjų proporcijų skirtumas tarp butų ir namų rinkų nėra statistiškai reikšmingas ($H_0$ negalime atmesti). Tai reiškia, kad privačių pardavėjų proporcijos abiejose rinkose yra panašios.
+Kadangi $\chi^2 = 1.6181 < 3.841 = \chi^2_{0.05(1)}$, tai padarome išvadą, kad privačių pardavėjų proporcijų skirtumas tarp butų ir namų rinkų nėra statistiškai reikšmingas ($H_0$ neatmetame). Tai reiškia, kad privačių pardavėjų proporcijos abiejose rinkose yra panašios.
 
-## Komercinių patalpų ploto ir peržiūrų skaičiaus koreliacija
+## Komercinių patalpų ploto dispersijų palyginimas
 ```{r}
 alpha <- 0.05 
-df <- 1474
-critical_T <- qt(1 - alpha, df)
-critical_T
+num_df <- 1475 # skaitiklio laisvės laipsnių skaičius
+denom_df <- 2059 # vardiklio laisvės laipsnių skaičius
+
+F25 <- qf(1-0.025, num_df, denom_df, lower.tail = TRUE) # apatinė reikšmė
+F75 <- qf(1-0.975, num_df, denom_df, lower.tail = TRUE) # viršutinė reikšmė
+
+# Rezultatai
+F25
+F75
 ```
-Kadangi $T = 4.166 > 1.646 = t_{0.05(1474)}$, tai padarome išvadą, kad koreliacijos koeficientas yra statistiškai reikšmingas ($H_0$ atmetame). Koreliacijos koeficientas ($r = 0.1079$) rodo silpną, bet reikšmingą teigiamą ryšį tarp komercinių patalpų ploto ir peržiūrų skaičiaus.
+Kadangi $F = 2.0921 > 1.09879 = F_{0.025}(1475, 2059),$ tai padarome išvadą, kad komercinių patalpų ploto dispersijos pardavimo ir nuomos sektoriuose skiriasi statistiškai reikšmingai ($H_0$ atmetame). Tai rodo, kad pardavimo ir nuomos sektoriai yra nevienodai homogeniški ploto atžvilgiu.
+
+## Renovuoti ir ne butai
+```{r}
+# Nustatomos kritinės t-reikšmės ir išvados
+alpha <- 0.05  # reikšmingumo lygis
+df <- nrow(combined_data_clean) - 1  # laisvės laipsnių skaičius
+critical_t <- qt(1 - alpha, df)
+
+cat("\nKritinė t-reikšmė:", critical_t, "\n")
+cat("Apskaičiuota t-reikšmė:", t_test_result$statistic, "\n")
+```
