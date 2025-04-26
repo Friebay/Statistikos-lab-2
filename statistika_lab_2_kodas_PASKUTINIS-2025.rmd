@@ -47,8 +47,6 @@ library(ggExtra)
 Šiame tyrime analizuojami Lietuvos nekilnojamojo turto rinkos duomenys,
 siekiant nustatyti įvairius dėsningumus ir statistines priklausomybes.
 
-Nekilnojamojo turto rinka yra vienas svarbiausių ekonomikos sektorių, turintis didelę įtaką tiek šalies ekonomikai, tiek gyventojų gerovei. Pastaraisiais metais Lietuvoje pastebimi reikšmingi pokyčiai nekilnojamojo turto rinkoje, susiję su ekonomikos augimu, demografiniais pokyčiais ir urbanizacijos procesais. Šių pokyčių analizė leidžia geriau suprasti rinkos dinamiką, identifikuoti pagrindinius veiksnius, lemiančius kainų svyravimus, ir prognozuoti ateities tendencijas. Tyrimo rezultatai gali būti naudingi ne tik akademinei bendruomenei, bet ir politikos formuotojams bei verslo atstovams, siekiantiems priimti pagrįstus sprendimus nekilnojamojo turto srityje.
-
 # Duomenų aprašymas
 
 Analizei naudojami duomenys buvo atsisiųsti iš [Lithuanian Real Estate
@@ -515,13 +513,13 @@ hist(duom$log_price,
      col = "skyblue", 
      main = "Namų kainų pasiskirstymas", 
      xlab = "Kaina (€)",
-     ylab = "dažnis")
+     ylab = "Dažnis")
 ```
 
 Statistinis tyrimas:
 
 ```{r}
-t.test(duom$log_price, mu = 100000, paired = FALSE, var.equal = TRUE)
+t.test(duom$log_price, mu = log(100000), paired = FALSE, var.equal = TRUE)
 ```
 
 Statistinė išvada: kadangi $p$-reikšmė ($< 2.2 \times 10^{-16}$) mažesnė
@@ -869,13 +867,37 @@ premises_rent_area <- as.numeric(gsub(",", ".", as.character(csv_data_list[["pre
 # Pašaliname NA ir nelogiškas reikšmes
 premises_area <- premises_area[!is.na(premises_area) & premises_area > 0 & premises_area < 10000]
 premises_rent_area <- premises_rent_area[!is.na(premises_rent_area) & premises_rent_area > 0 & premises_rent_area < 10000]
+
+par(mfrow=c(2,2))
+hist(premises_area, main="Renovuotų butų kainų pasiskirstymas",
+xlab="Kaina (EUR)", col="skyblue")
+hist(premises_rent_area, main="Nerenovuotų butų kainų pasiskirstymas",
+xlab="Kaina (EUR)", col="skyblue")
+
+qqnorm(premises_area, main="Renovuotų butų QQ grafikas")
+qqline(premises_area)
+qqnorm(premises_rent_area, main="Nerenovuotų butų QQ grafikas")
+qqline(premises_rent_area)
+
+log_premises_area <- log(premises_area)
+log_premises_rent_area <- log(premises_rent_area)
+
+hist(log_premises_area, main="Log-transformuotos renovuotų butų kainos",
+xlab="ln(Kaina)", col="skyblue")
+hist(log_premises_rent_area, main="Log-transformuotos nerenovuotų butų kainos",
+xlab="ln(Kaina)", col="skyblue")
+
+qqnorm(log_premises_area, main="Log-renovuotų butų QQ grafikas")
+qqline(log_premises_area)
+qqnorm(log_premises_rent_area, main="Log-nerenovuotų butų QQ grafikas")
+qqline(log_premises_rent_area)
 ```
 
 Statistinis tyrimas:
 
 ```{r}
 f_test_results <- var.test(
-  premises_area, premises_rent_area, alternative = "two.sided")
+  log_premises_area, log_premises_rent_area, alternative = "two.sided")
 
 print(f_test_results)
 ```
